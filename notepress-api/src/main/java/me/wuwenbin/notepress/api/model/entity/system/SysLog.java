@@ -1,0 +1,29 @@
+package me.wuwenbin.notepress.api.model.entity.system;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+/**
+ * @author wuwen
+ */
+@Data
+@Builder
+public class SysLog implements Serializable {
+
+    private String id;
+    private String contentType;
+    private String ipAddr;
+    private String ipInfo;
+    private String requestMethod;
+    private String sessionId;
+    private String url;
+    private String userAgent;
+    private String username;
+    private LocalDateTime time;
+    private String browser;
+    private Long userId;
+
+}

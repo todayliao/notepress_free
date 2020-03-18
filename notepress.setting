@@ -1,0 +1,30 @@
+#jwt验证相关，关系到后台管理，请自行替换成自己的
+[jwt]
+#jwt签发主题，请自行替换
+name: notepressapi
+#clientId，客户端id，请自行替换
+clientId = 418e12f3c8460cbe20c13099929e24a0
+#base64加密过的秘钥，请自行替换
+base64Secret = NDE4ZTEyZjNjODQ2MGNiZTIwYzEzMDk5OTI5ZTI0YTA
+# AES加密密钥（16位），请自行替换(cookie和jwt的部分字段）
+aesKey = ___notepress____
+
+#数据库相关设置，若留空，则取缺省值
+[db]
+ip =
+port =
+name =
+user =
+pass =
+useSSL = false
+#配置jdbcUrl则以上数据库属性配置失效
+jdbcUrl =
+
+#app相关配置
+[app]
+#启动程序时是否初始化数据库，此项为重新安装使用，切勿随意更改
+startInit = true
+#文件上传绝对路径,默认是在jar的同级目录下的upload文件夹下
+uploadPath = file:///D:/dev/notepress/upload/
+#页面模板存放路径文件夹（此处配置的为绝对路径，以 / 结尾）
+themesPath = D:/WebstormProjects/themes/
