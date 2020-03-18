@@ -7,3 +7,20 @@
 + 更多详情请关注网站作者网站：<<[NoteLoft](https://wuwenbin.me)>> <br/>
 # 当前版本 
 v2020.001
+
+# 部分测试预览图
+[](img/1.png)
+[](img/2.png)
+[](img/3.png)
+[](img/4.png)
+[](img/5.png)
+[](img/6.png)
+[](img/7.png)
+[](img/8.png)
+[](img/9.png)
+[](img/10.png)
+[](img/11.png)
+[](img/12.png)
+[](img/13.png)
+[](img/14.png)
+[](img/15.png)
