@@ -5,11 +5,20 @@
 + 移动端适应良好，自带富文本编辑器和markdown编辑器两种类型，自由选择，<br/>
 + 网站风格设置多种（共5种风格设置），支持github、qq登录等第三方登录方式。<br/>
 + 更多详情请关注网站作者网站：<<[NoteLoft](https://wuwenbin.me)>> <br/>
+
 # 当前版本 
 v2020.001
 
+# 运行/部署步骤
++ 待添加...
+
+# 更多信息
++ 腾讯文档：https://docs.qq.com/doc/DVmlRa3NydlRSU0hZ
++ 前/后台的前端html工程请至QQ群获取
++ 完整的详细文档请至QQ群，联系群主获取方式
+
 # 部分测试预览图
-!![](https://gitee.com/wuwenbn/notepress_free/raw/master/img/1.img/1.png)
+![](img/1.png)
 ![](img/2.png)
 ![](img/3.png)
 ![](img/4.png)
