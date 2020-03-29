@@ -197,7 +197,6 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
                 return newUpload(uploadParam, "", src, file.getContentType());
             } else {
                 throw new NotePressException("==> 上传文件至七牛云失败，信息：" + res.error);
-
             }
         } catch (QiniuException e) {
             Response re = e.response;

@@ -63,4 +63,13 @@ public interface ISysUserService extends INotePressService<SysUser> {
      * @return
      */
     NotePressResult doReg(SysUser sysUser);
+
+    /**
+     * 用户更新信息
+     *
+     * @param nickname
+     * @param pwd
+     * @return
+     */
+    NotePressResult userUpdateInfo(String nickname, String pwd);
 }

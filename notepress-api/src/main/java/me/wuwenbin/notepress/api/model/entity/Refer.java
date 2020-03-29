@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import me.wuwenbin.notepress.api.constants.enums.ReferTypeEnum;
-import me.wuwenbin.notepress.api.exception.NotePressException;
 import me.wuwenbin.notepress.api.model.entity.base.BaseEntity;
 
 import java.util.Map;
@@ -28,7 +27,7 @@ public class Refer extends BaseEntity<Refer> {
         if (StrUtil.isNotEmpty(this.referExtra)) {
             return JSONUtil.toBean(this.referExtra, clazz);
         }
-        throw new NotePressException("refer_extra为空！");
+        return null;
     }
 
     public Map<String, Object> getReferExtra() {
@@ -36,6 +35,6 @@ public class Refer extends BaseEntity<Refer> {
             //noinspection unchecked
             return JSONUtil.toBean(this.referExtra, Map.class);
         }
-        throw new NotePressException("refer_extra为空！");
+        return null;
     }
 }

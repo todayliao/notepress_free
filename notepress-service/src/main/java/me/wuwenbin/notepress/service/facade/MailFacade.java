@@ -58,7 +58,7 @@ public class MailFacade {
      * @param message
      * @param basePath
      */
-    public void sendNotice(String message, String basePath) {
+    public void sendNotice(String message, String basePath, String contentId) {
         String targetMail = NotePressUtils.getBean(ISysUserService.class).getOne(SysUserQuery.buildByAdmin(true)).getEmail();
         Param websiteTitleParam = paramService.getOne(ParamQuery.build((ParamKeyConstant.WEBSITE_NAME)));
         String websiteTitle = websiteTitleParam.getValue();
@@ -67,7 +67,12 @@ public class MailFacade {
         //noinspection MismatchedQueryAndUpdateOfCollection
         Setting noticeSettings = new Setting(FilePathConstants.FILE_MAIL_SETTINGS);
         String content = noticeSettings.getStr("template_notice", "{}");
-        content = StrUtil.format(content, websiteTitle, message, basePath);
+        if (StrUtil.isEmpty(contentId) || "-1".equalsIgnoreCase(contentId)) {
+            contentId = "message";
+        } else {
+            contentId = "content/".concat(contentId);
+        }
+        content = StrUtil.format(content, websiteTitle, message, basePath, contentId);
         NotePressMailUtils.sendMail(subject, targetMail, content, true);
     }
 

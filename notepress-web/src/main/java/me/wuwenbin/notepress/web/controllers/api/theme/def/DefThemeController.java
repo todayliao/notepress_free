@@ -189,7 +189,7 @@ public class DefThemeController extends NotePressBaseController {
         BeanUtils.copyProperties(page, pageParam);
         List<Set<Dictionary>> dictSetList = new ArrayList<>();
         Function<Content, Set<Dictionary>> mapper = content -> {
-            Set<String> tagIdList = referService.list(ReferQuery.build(content.getId(), ReferTypeEnum.CONTENT_TAG))
+            Set<String> tagIdList = referService.list(ReferQuery.buildBySelfIdAndType(content.getId(), ReferTypeEnum.CONTENT_TAG))
                     .stream().map(Refer::getReferId).collect(Collectors.toSet());
             return new HashSet<>(dictionaryService.list(DictionaryQuery.buildByIdCollection(tagIdList)));
         };
@@ -329,7 +329,7 @@ public class DefThemeController extends NotePressBaseController {
                 toMap(
                         Content::getId,
                         content -> {
-                            List<String> tagIdList = referService.list(ReferQuery.build(content.getId(), ReferTypeEnum.CONTENT_TAG))
+                            List<String> tagIdList = referService.list(ReferQuery.buildBySelfIdAndType(content.getId(), ReferTypeEnum.CONTENT_TAG))
                                     .stream().map(Refer::getReferId).collect(Collectors.toList());
                             return dictionaryService.list(DictionaryQuery.buildByIdCollection(tagIdList));
                         }

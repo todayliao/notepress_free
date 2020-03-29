@@ -139,7 +139,7 @@ public class NotePressContentController extends NotePressBaseController {
      * @return
      */
     private List<Dictionary> contentTagList(String contentId) {
-        List<String> tagIdList = referService.list(ReferQuery.build(contentId, ReferTypeEnum.CONTENT_TAG))
+        List<String> tagIdList = referService.list(ReferQuery.buildBySelfIdAndType(contentId, ReferTypeEnum.CONTENT_TAG))
                 .stream().map(Refer::getReferId).collect(Collectors.toList());
         return dictionaryService.list(DictionaryQuery.buildByIdCollection(tagIdList));
     }

@@ -35,6 +35,11 @@ public interface UploadConstant {
     String FORM_NAME_COMMON = "notepressFile";
 
     /**
+     * 上传资源文件至七牛
+     */
+    String FORM_NAME_QINIU = "qiniu-res-file";
+
+    /**
      * 上传文件对象参数名，editormd
      */
     String FORM_NAME_EDITORMD = "editormd-image-file";

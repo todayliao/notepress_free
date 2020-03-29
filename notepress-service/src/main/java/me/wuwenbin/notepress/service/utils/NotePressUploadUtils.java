@@ -84,19 +84,53 @@ public class NotePressUploadUtils {
     }
 
     /**
-     * 获取uptoken
+     * 获取bucketName
+     *
+     * @return
+     */
+    public static String getBucketName() {
+        ParamMapper paramMapper = NotePressUtils.getBean(ParamMapper.class);
+        return paramMapper.selectOne(ParamQuery.build(ParamKeyConstant.QINIU_BUCKET)).getValue();
+    }
+
+    /**
+     * 简单上传获取uptoken
      *
      * @return
      */
     public static String getQiniuUpToken() {
         ParamMapper paramMapper = NotePressUtils.getBean(ParamMapper.class);
+        String bucketName = paramMapper.selectOne(ParamQuery.build(ParamKeyConstant.QINIU_BUCKET)).getValue();
+        //简单上传，使用默认策略，只需要设置上传的空间名就可以了
+        return getQiniuAuth().uploadToken(bucketName);
+    }
+
+    /**
+     * 覆盖上传获取uptoken
+     *
+     * @param fileKey
+     * @return
+     */
+    public static String getQiniuUpToken(String fileKey) {
+        ParamMapper paramMapper = NotePressUtils.getBean(ParamMapper.class);
+        String bucketName = paramMapper.selectOne(ParamQuery.build(ParamKeyConstant.QINIU_BUCKET)).getValue();
+        //简单上传，使用默认策略，只需要设置上传的空间名就可以了
+        return getQiniuAuth().uploadToken(bucketName, fileKey);
+    }
+
+    /**
+     * 获取 Auth
+     *
+     * @return
+     */
+    public static Auth getQiniuAuth() {
+        ParamMapper paramMapper = NotePressUtils.getBean(ParamMapper.class);
         String accessKey = paramMapper.selectOne(ParamQuery.build(ParamKeyConstant.QINIU_ACCESS_KEY)).getValue();
         String secretKey = paramMapper.selectOne(ParamQuery.build(ParamKeyConstant.QINIU_SECRET_KEY)).getValue();
-        String bucketName = paramMapper.selectOne(ParamQuery.build(ParamKeyConstant.QINIU_BUCKET)).getValue();
         //密钥配置
-        Auth auth = Auth.create(accessKey, secretKey);
         //简单上传，使用默认策略，只需要设置上传的空间名就可以了
-        return auth.uploadToken(bucketName);
+        return Auth.create(accessKey, secretKey);
     }
+
 
 }

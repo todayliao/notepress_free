@@ -8,10 +8,10 @@
     <parent>
         <artifactId>notepress-parent</artifactId>
         <groupId>me.wuwenbin</groupId>
-        <version>v2020.001</version>
+        <version>v2020.002</version>
     </parent>
     <artifactId>notepress-springboot-container</artifactId>
-    <version>v2020.001</version>
+    <version>v2020.002</version>
 
     <description>
         项目的启动容器模块，依赖notepress-web模块
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>me.wuwenbin</groupId>
             <artifactId>notepress-web</artifactId>
-            <version>v2020.001</version>
+            <version>v2020.002</version>
         </dependency>
     </dependencies>
 

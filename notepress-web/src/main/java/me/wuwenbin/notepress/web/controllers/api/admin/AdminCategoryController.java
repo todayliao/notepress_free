@@ -30,8 +30,8 @@ public class AdminCategoryController extends NotePressBaseController {
     private final ICategoryService categoryService;
 
     @PostMapping
-    public NotePressResult userList(Page<Category> categoryPage,
-                                    @RequestBody LayuiTableQuery<Category> layuiTableQuery) {
+    public NotePressResult resCateList(Page<Category> categoryPage,
+                                       @RequestBody LayuiTableQuery<Category> layuiTableQuery) {
         return writeJsonLayuiTable(categoryService.findCategoryList(categoryPage, layuiTableQuery));
     }
 

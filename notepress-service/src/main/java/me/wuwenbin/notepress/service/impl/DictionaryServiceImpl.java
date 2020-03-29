@@ -60,6 +60,6 @@ public class DictionaryServiceImpl extends ServiceImpl<DictionaryMapper, Diction
 
     @Override
     public NotePressResult top30TagList() {
-        return NotePressResult.createOkData(dictionaryMapper.topTagList(30));
+        return NotePressResult.createOkData(dictionaryMapper.topTagList(30, null));
     }
 }

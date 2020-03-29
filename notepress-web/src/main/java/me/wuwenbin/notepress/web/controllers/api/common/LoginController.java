@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
 
 /**
  * @author wuwen
@@ -89,7 +90,7 @@ public class LoginController extends NotePressBaseController {
      */
     @GetMapping("/{logoutType}/logout")
     public NotePressResult logout(@PathVariable String logoutType) {
-        log.info("登录类型：{}，【{}】退出登录", logoutType, NotePressSessionUtils.getSessionUser().getUsername());
+        log.info("登录类型：{}，【{}】退出登录", logoutType, Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getUsername());
         NotePressSessionUtils.invalidSessionUser();
         return NotePressResult.createOkMsg("退出成功！");
     }

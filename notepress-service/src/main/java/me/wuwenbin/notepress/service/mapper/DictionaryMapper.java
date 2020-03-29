@@ -19,11 +19,23 @@ public interface DictionaryMapper extends NotePressMapper<Dictionary> {
      * 前{@param size}个tag集合
      *
      * @param size
+     * @param ids
      * @return
      */
-    @Select("SELECT d.id, d.dict_value, count(r.refer_id) as cnt " +
-            "from np_refer r left join np_dictionary d on d.id = r.refer_id " +
-            "where r.refer_type = 'content_tag' " +
-            "group by r.refer_id order by cnt desc limit #{size}")
-    List<Map<String, Object>> topTagList(@Param("size") int size);
+    @Select({
+            "<script>",
+            "SELECT",
+            "d.id, d.dict_value, count(r.refer_id) as cnt ",
+            "from np_refer r left join np_dictionary d on d.id = r.refer_id ",
+            "where r.refer_type = 'content_tag' ",
+            "<if test='ids != null'>",
+            "and d.id not in",
+            "<foreach collection='ids' item='id' open='(' separator=',' close=')'>",
+            "#{id}",
+            "</foreach>",
+            "</if>",
+            "group by r.refer_id order by cnt desc limit #{size}",
+            "</script>"
+    })
+    List<Map<String, Object>> topTagList(@Param("size") int size, @Param("ids") List<Long> ids);
 }

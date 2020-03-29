@@ -10,7 +10,7 @@ import me.wuwenbin.notepress.api.model.entity.Refer;
  */
 public class ReferQuery extends BaseQuery {
 
-    public static QueryWrapper<Refer> build(String selfId, ReferTypeEnum referTypeEnum) {
+    public static QueryWrapper<Refer> buildBySelfIdAndType(String selfId, ReferTypeEnum referTypeEnum) {
         return Wrappers.<Refer>query()
                 .eq("self_id", selfId)
                 .eq("refer_type", referTypeEnum.getValue());

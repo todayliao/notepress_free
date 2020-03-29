@@ -81,4 +81,13 @@ public interface ReferMapper extends NotePressMapper<Refer> {
     @Select("select * from np_refer where refer_id = #{referId} and refer_type = #{referType}")
     List<Refer> findRefersByTypeAndReferId(@Param("referId") String referId, @Param("referType") ReferTypeEnum referTypeEnum);
 
+    /**
+     * 根据类型和参考id查询对应的目标id
+     * @param selfId
+     * @param referTypeEnum
+     * @return
+     */
+    @Select("select * from np_refer where self_id = #{selfId} and refer_type = #{referType}")
+    List<Refer> findRefersByTypeAndSelfId(@Param("selfId") String selfId, @Param("referType") ReferTypeEnum referTypeEnum);
+
 }

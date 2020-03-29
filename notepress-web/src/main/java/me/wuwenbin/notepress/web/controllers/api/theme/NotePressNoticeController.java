@@ -2,6 +2,7 @@ package me.wuwenbin.notepress.web.controllers.api.theme;
 
 
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -99,7 +100,11 @@ public class NotePressNoticeController extends NotePressBaseController {
                 if (subRes.isSuccess()) {
                     String mailStatus = toRNull(paramService.fetchParamByName(SWITCH_COMMENT_NOTICE_MAIL), Param.class, Param::getValue);
                     if ("1".equals(mailStatus)) {
-                        mailFacade.sendNotice(notice.getCommentHtml(), basePath(request));
+                        String sendContent = "------<br/>" +
+                                "<b>用户</b>：【<span style='color:red;'>{}</span>】 在 <b>{}</b>楼发表了内容：{}</br>" +
+                                "------</br>";
+                        sendContent = StrUtil.format(sendContent, userService.getById(notice.getUserId()).getUsername(), notice.getFloor(), notice.getCommentHtml());
+                        mailFacade.sendNotice(sendContent, basePath(request), notice.getContentId());
                     }
                     if (!StringUtils.isEmpty(notice.getReplyId())) {
                         String email = userService.getById(notice.getReplyId()).getEmail();
@@ -118,15 +123,17 @@ public class NotePressNoticeController extends NotePressBaseController {
 
     //========================私有方法=======================
 
-    private Map<Long, Map<String, String>> messageUserInfo(Page<SysNotice> page) {
+    private Map<Long, Map<String, Object>> messageUserInfo(Page<SysNotice> page) {
         return page.getRecords().stream().collect(
                 Collectors.toMap(
                         SysNotice::getId,
                         sysNotice -> {
-                            Map<String, String> resMap = new HashMap<>(2);
+                            Map<String, Object> resMap = new HashMap<>(2);
                             SysUser u = userService.getById(sysNotice.getUserId());
                             resMap.put("avatar", u.getAvatar());
                             resMap.put("nickname", u.getNickname());
+                            resMap.put("admin", u.getAdmin());
+                            resMap.put("email", u.getEmail());
                             return resMap;
                         }
                 )

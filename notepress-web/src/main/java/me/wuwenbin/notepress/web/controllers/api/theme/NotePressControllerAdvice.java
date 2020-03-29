@@ -12,12 +12,10 @@ import me.wuwenbin.notepress.api.constants.ParamKeyConstant;
 import me.wuwenbin.notepress.api.model.entity.Param;
 import me.wuwenbin.notepress.api.model.entity.system.SysUser;
 import me.wuwenbin.notepress.api.query.ParamQuery;
-import me.wuwenbin.notepress.api.service.ICategoryService;
-import me.wuwenbin.notepress.api.service.IContentService;
-import me.wuwenbin.notepress.api.service.IParamService;
-import me.wuwenbin.notepress.api.service.ISysNoticeService;
+import me.wuwenbin.notepress.api.service.*;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
+import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,12 +35,13 @@ import java.util.stream.Collectors;
  */
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 @ControllerAdvice(basePackages = "me.wuwenbin.notepress.web.controllers")
-public class NotePressControllerAdvice {
+public class NotePressControllerAdvice extends NotePressBaseController {
 
     private final IParamService paramService;
     private final ICategoryService categoryService;
     private final IContentService contentService;
     private final ISysNoticeService sysNoticeService;
+    private final IDealService dealService;
 
 
     @ModelAttribute("settings")
@@ -96,6 +95,8 @@ public class NotePressControllerAdvice {
         if (user != null) {
             Map<String, Object> userMap = BeanUtil.beanToMap(user);
             userMap.remove("password");
+            Integer c = toRNull(dealService.findCoinSumByUserId(user.getId()), Integer.class, coin -> coin);
+            userMap.putIfAbsent("coin", c);
             return userMap;
         }
         return null;

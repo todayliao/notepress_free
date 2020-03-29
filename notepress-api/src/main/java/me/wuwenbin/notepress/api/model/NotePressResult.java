@@ -116,10 +116,6 @@ public class NotePressResult extends ConcurrentHashMap<String, Object> {
         return MapUtil.getInt(this, CODE) == SUCCESS;
     }
 
-    public void setMsg(String message) {
-        this.put(MESSAGE, message);
-    }
-
     public Integer getIntData() {
         return MapUtil.getInt(this, DATA);
     }
@@ -213,9 +209,12 @@ public class NotePressResult extends ConcurrentHashMap<String, Object> {
         return Convert.toMap(keyClass, valueClass, getData());
     }
 
-
     public String getMsg() {
         return MapUtil.getStr(this, MESSAGE);
+    }
+
+    public void setMsg(String message) {
+        this.put(MESSAGE, message);
     }
 
     public Integer getCode() {

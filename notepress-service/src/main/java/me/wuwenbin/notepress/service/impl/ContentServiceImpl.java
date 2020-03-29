@@ -166,13 +166,13 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
         Content content = contentMapper.selectById(id);
         ContentHelper.handleBasePath(content, false);
         //查询对应的分类
-        List<Refer> referCategoryList = referMapper.selectList(ReferQuery.build(id, ReferTypeEnum.CONTENT_CATEGORY));
+        List<Refer> referCategoryList = referMapper.selectList(ReferQuery.buildBySelfIdAndType(id, ReferTypeEnum.CONTENT_CATEGORY));
         List<Category> categories = referCategoryList.stream().map(refer -> categoryMapper.selectById(refer.getReferId())).collect(Collectors.toList());
         content.setCateList(categories);
         List<String> categoryList = categories.stream().map(Category::getNickname).collect(Collectors.toList());
         content.setCategories(categoryList);
         //查询对应的标签
-        List<Refer> referTagList = referMapper.selectList(ReferQuery.build(id, ReferTypeEnum.CONTENT_TAG));
+        List<Refer> referTagList = referMapper.selectList(ReferQuery.buildBySelfIdAndType(id, ReferTypeEnum.CONTENT_TAG));
         List<Dictionary> tags = referTagList.stream().map(refer -> dictionaryMapper.selectById(refer.getReferId())).collect(Collectors.toList());
         content.setTagList(tags);
         List<String> tagList = tags.stream().map(Dictionary::getDictValue).collect(Collectors.toList());
@@ -228,7 +228,7 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
                         finalQuery = finalQuery.notIn("id", excludeContentIdSet);
                     } else {
                         Set<String> resultContentIdSet = contentIdSet.stream().filter(c -> !excludeContentIdSet.contains(c)).collect(Collectors.toSet());
-                        finalQuery = finalQuery.in("id", resultContentIdSet);
+                        finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(resultContentIdSet), "id", resultContentIdSet);
                     }
                 } else {
                     finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet), "id", contentIdSet);

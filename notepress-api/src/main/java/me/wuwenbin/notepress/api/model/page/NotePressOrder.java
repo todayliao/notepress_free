@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author wuwenbin
  */
-public class PageParam implements Serializable {
+public class NotePressOrder implements Serializable {
 
 
     /**

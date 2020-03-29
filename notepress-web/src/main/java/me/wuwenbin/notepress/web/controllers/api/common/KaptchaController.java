@@ -5,6 +5,7 @@ import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.Producer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.wuwenbin.notepress.api.annotation.JwtIgnore;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class KaptchaController extends NotePressBaseController {
     private final Cache<String, String> kaptchaCodeCache;
 
     @GetMapping("/image/code")
+    @JwtIgnore
     public void kaptcha(HttpServletResponse response) throws IOException {
         response.setDateHeader("Expires", 0);
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");

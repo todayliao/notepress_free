@@ -2,8 +2,10 @@ package me.wuwenbin.notepress.service.impl;
 
 import cn.hutool.cache.Cache;
 import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import me.wuwenbin.notepress.api.model.NotePressResult;
@@ -172,5 +174,23 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         sysUser.setPassword(SecureUtil.md5(sysUser.getPassword()));
         return addUser(sysUser);
+    }
+
+    @Override
+    public NotePressResult userUpdateInfo(String nickname, String pwd) {
+        SysUser sessionUser = NotePressSessionUtils.getSessionUser();
+        if (sessionUser != null) {
+            if (!sessionUser.getPassword().contentEquals(SecureUtil.md5(pwd))) {
+                boolean res = this.update(
+                        Wrappers.<SysUser>update()
+                                .set(StrUtil.isNotEmpty(nickname), "nickname", nickname)
+                                .set(StrUtil.isNotEmpty(pwd), "password", SecureUtil.md5(pwd))
+                                .eq("id", sessionUser.getId()));
+                if (res) {
+                    return NotePressResult.createOkMsg("修改成功！");
+                }
+            }
+        }
+        return NotePressResult.createErrorMsg("修改未成功，请稍后重试！");
     }
 }

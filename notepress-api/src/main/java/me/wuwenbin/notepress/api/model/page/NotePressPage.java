@@ -8,7 +8,7 @@ import java.util.List;
  *
  * @author wuwenbin
  */
-public class PageResult<T> extends PageParam {
+public class NotePressPage<T> extends NotePressOrder {
 
     /**
      * 当前页面编号，默认1
@@ -36,18 +36,18 @@ public class PageResult<T> extends PageParam {
 
     //some construct methods
 
-    public PageResult() {
+    public NotePressPage() {
     }
 
-    public PageResult(int pageSize) {
+    public NotePressPage(int pageSize) {
         this.pageSize = pageSize;
     }
 
-    public PageResult(List<T> data) {
+    public NotePressPage(List<T> data) {
         this.result = data;
     }
 
-    public PageResult(int pageSize, String orderDirection, String orderField) {
+    public NotePressPage(int pageSize, String orderDirection, String orderField) {
         this.pageSize = pageSize;
         super.orderDirection = orderDirection;
         super.orderField = orderField;

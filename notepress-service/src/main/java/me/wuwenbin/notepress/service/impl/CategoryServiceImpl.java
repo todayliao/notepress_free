@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import me.wuwenbin.notepress.api.constants.enums.ReferTypeEnum;
 import me.wuwenbin.notepress.api.model.NotePressResult;
 import me.wuwenbin.notepress.api.model.entity.Category;
-import me.wuwenbin.notepress.api.model.entity.Refer;
 import me.wuwenbin.notepress.api.model.layui.query.LayuiTableQuery;
 import me.wuwenbin.notepress.api.query.ReferQuery;
 import me.wuwenbin.notepress.api.service.ICategoryService;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +36,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Override
     public NotePressResult findCategoryListByContentId(String contentId) {
-        List<Category> categories = referMapper.selectList(ReferQuery.build(contentId, ReferTypeEnum.CONTENT_CATEGORY))
+        List<Category> categories = referMapper.selectList(ReferQuery.buildBySelfIdAndType(contentId, ReferTypeEnum.CONTENT_CATEGORY))
                 .stream().map(refer -> categoryMapper.selectById(refer.getReferId())).collect(Collectors.toList());
         return NotePressResult.createOkData(categories);
     }

@@ -1,7 +1,7 @@
 package me.wuwenbin.notepress.service.mapper.base;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import me.wuwenbin.notepress.api.model.page.PageResult;
+import me.wuwenbin.notepress.api.model.page.NotePressPage;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
      * @param page
      * @return
      */
-    default String getSqlOfMySql(final String sql, PageResult<?> page) {
+    default String getSqlOfMySql(final String sql, NotePressPage<?> page) {
         String querySql = sql;
         if (page.isFirstSetted() && page.isPageSizeSetted()) {
             querySql = querySql.concat(" LIMIT " + page.getFirst() + "," + page.getPageSize());
@@ -881,7 +881,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
      * @param arrayParameters
      * @return
      */
-    default PageResult<Map<String, Object>> findPageListMapByArray(String sql, PageResult<Map<String, Object>> page, Object... arrayParameters) {
+    default NotePressPage<Map<String, Object>> findPageListMapByArray(String sql, NotePressPage<Map<String, Object>> page, Object... arrayParameters) {
         Assert.notNull(page, "==> 分页信息不能为空");
         Assert.hasText(sql, "==> sql语句不正确!");
         long count;
@@ -902,7 +902,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
      * @param mapParameter
      * @return
      */
-    default PageResult<Map<String, Object>> findPageListMapByMap(String sql, PageResult<Map<String, Object>> page, Map<String, Object> mapParameter) {
+    default NotePressPage<Map<String, Object>> findPageListMapByMap(String sql, NotePressPage<Map<String, Object>> page, Map<String, Object> mapParameter) {
         Assert.notNull(page, "==> 分页信息不能为空");
         Assert.hasText(sql, "==> sql语句不正确!");
         long count;
@@ -924,7 +924,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
      * @param arrayParameters
      * @return
      */
-    default PageResult<T> findPageListBeanByArray(String sql, Class<T> clazz, PageResult<T> page, Object... arrayParameters) {
+    default NotePressPage<T> findPageListBeanByArray(String sql, Class<T> clazz, NotePressPage<T> page, Object... arrayParameters) {
         Assert.notNull(page, "分页信息不能为空");
         Assert.hasText(sql, "sql语句不正确!");
         long count;
@@ -946,7 +946,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
      * @param mapParameter
      * @return
      */
-    default PageResult<T> findPageListBeanByMap(String sql, Class<T> clazz, PageResult<T> page, Map<String, Object> mapParameter) {
+    default NotePressPage<T> findPageListBeanByMap(String sql, Class<T> clazz, NotePressPage<T> page, Map<String, Object> mapParameter) {
         Assert.notNull(page, "分页信息不能为空");
         Assert.hasText(sql, "sql语句不正确!");
         long count;
@@ -968,7 +968,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
      * @param beanParameter
      * @return
      */
-    default PageResult<T> findPageListBeanByBean(String sql, Class<T> clazz, PageResult<T> page, Object beanParameter) {
+    default NotePressPage<T> findPageListBeanByBean(String sql, Class<T> clazz, NotePressPage<T> page, Object beanParameter) {
         Assert.notNull(page, "分页信息不能为空");
         Assert.hasText(sql, "sql语句不正确!");
         long count;

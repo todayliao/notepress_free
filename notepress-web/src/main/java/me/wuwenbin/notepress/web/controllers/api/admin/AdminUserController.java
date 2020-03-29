@@ -1,24 +1,32 @@
 package me.wuwenbin.notepress.web.controllers.api.admin;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import me.wuwenbin.notepress.api.model.NotePressResult;
+import me.wuwenbin.notepress.api.model.entity.Deal;
 import me.wuwenbin.notepress.api.model.entity.system.SysUser;
 import me.wuwenbin.notepress.api.model.layui.query.LayuiTableQuery;
 import me.wuwenbin.notepress.api.query.ReferQuery;
 import me.wuwenbin.notepress.api.query.SysNoticeQuery;
+import me.wuwenbin.notepress.api.service.IDealService;
 import me.wuwenbin.notepress.api.service.IReferService;
 import me.wuwenbin.notepress.api.service.ISysNoticeService;
 import me.wuwenbin.notepress.api.service.ISysUserService;
+import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * created by Wuwenbin on 2019/11/29 at 3:36 下午
@@ -33,6 +41,7 @@ public class AdminUserController extends NotePressBaseController {
     private final ISysUserService userService;
     private final IReferService referService;
     private final ISysNoticeService noticeService;
+    private final IDealService dealService;
 
     @PostMapping
     public NotePressResult userList(Page<SysUser> sysUserPage, @RequestBody LayuiTableQuery<SysUser> layuiTableQuery) {
@@ -73,4 +82,26 @@ public class AdminUserController extends NotePressBaseController {
         return writeJsonJudgedBool(res, "删除成功！", "删除失败！");
     }
 
+    @PostMapping("/recharge")
+    public NotePressResult rechargeUser(@NotEmpty String coin, @NotEmpty Long userId) {
+        if (NumberUtil.isInteger(coin)) {
+            SysUser user = userService.getById(userId);
+            if (user != null) {
+                boolean res = dealService.save(
+                        Deal.builder()
+                                .dealAmount(Convert.toInt(coin, 1)).userId(userId)
+                                .build().gmtCreate(LocalDateTime.now())
+                                .createBy(Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getId())
+                                .remark("管理员充值"));
+                return writeJsonJudgedBool(res, "充值成功！", "充值失败！");
+            }
+            return NotePressResult.createErrorMsg("充值失败，请选择充值的用户！");
+        }
+        return NotePressResult.createErrorMsg("充值失败，请正确填写！");
+    }
+
+    @GetMapping("/getCoin")
+    public NotePressResult getCoin(Long userId) {
+        return writeJson(() -> dealService.findCoinSumByUserId(userId));
+    }
 }

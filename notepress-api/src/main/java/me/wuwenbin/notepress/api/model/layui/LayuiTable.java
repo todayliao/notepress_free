@@ -2,7 +2,7 @@ package me.wuwenbin.notepress.api.model.layui;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import me.wuwenbin.notepress.api.exception.NotePressErrorCode;
-import me.wuwenbin.notepress.api.model.page.PageResult;
+import me.wuwenbin.notepress.api.model.page.NotePressPage;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -47,8 +47,8 @@ public class LayuiTable<T> implements Serializable {
         this.data = data;
     }
 
-    public static <T> LayuiTable<T> success(PageResult<T> pageResult) {
-        return new LayuiTable<>(pageResult.getTotalCount(), pageResult.getTResult());
+    public static <T> LayuiTable<T> success(NotePressPage<T> notePressPage) {
+        return new LayuiTable<>(notePressPage.getTotalCount(), notePressPage.getTResult());
     }
 
     public static <T> LayuiTable<T> success(IPage<T> page) {

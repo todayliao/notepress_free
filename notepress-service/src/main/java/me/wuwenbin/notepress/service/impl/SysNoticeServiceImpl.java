@@ -30,10 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author wuwen
@@ -113,7 +110,7 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
         keywords.forEach(
                 kw -> notice.setCommentHtml(notice.getCommentHtml().replace(kw.getDictValue(), StrUtil.repeat("*", kw.getDictValue().length()))));
         notice.setGmtCreate(LocalDateTime.now());
-        notice.setCreateBy(NotePressSessionUtils.getSessionUser().getId());
+        notice.setCreateBy(Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getId());
         int floor = Convert.toInt(sysNoticeMapper.findMaxFloorByContentId(notice.getContentId()), 0);
         notice.setFloor(floor + 1);
         return NotePressResult.createOkData(sysNoticeMapper.insert(notice));
