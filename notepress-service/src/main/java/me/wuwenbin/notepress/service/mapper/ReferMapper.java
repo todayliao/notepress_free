@@ -68,7 +68,7 @@ public interface ReferMapper extends NotePressMapper<Refer> {
      * @param uuid
      * @return
      */
-    @Select("select * from np_refer where json_extract(refer_extra,'$.source') = #{source} and self_id = #{uuid};")
+    @Select("select * from np_refer where refer_type = 'third_user' and json_extract(refer_extra,'$.source') = #{source} and self_id = #{uuid};")
     Refer findUserReferBySourceAndUuid(@Param("source") String source, @Param("uuid") String uuid);
 
 

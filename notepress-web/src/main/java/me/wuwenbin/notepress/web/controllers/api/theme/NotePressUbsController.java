@@ -1,5 +1,6 @@
 package me.wuwenbin.notepress.web.controllers.api.theme;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -105,6 +107,9 @@ public class NotePressUbsController extends NotePressBaseController {
                 ReferQuery.buildBySelfIdAndType(sessionUser.getId().toString(), ReferTypeEnum.USER_RES))
                 .stream()
                 .map(refer -> resService.getById(refer.getReferId()).getId()).collect(Collectors.toList());
+        if (CollectionUtil.isEmpty(resIds)) {
+            resIds = Collections.singletonList("0");
+        }
         IPage<Res> rPage = resService.page(page, Wrappers.<Res>query().in("id", resIds));
         return writeJsonOk(rPage);
     }

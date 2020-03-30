@@ -5,6 +5,7 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import cn.hutool.json.JSONUtil;
 import com.google.code.kaptcha.Constants;
 import lombok.RequiredArgsConstructor;
@@ -66,6 +67,8 @@ public class NotePressLoginController extends NotePressBaseController {
     private final MailFacade mailFacade;
     @Qualifier("mailCodeCache")
     private final Cache<String, String> mailCodeCache;
+    @Qualifier("kaptchaCodeCache")
+    private final Cache<String, String> kaptchaCodeCache;
 
 
     /**
@@ -229,8 +232,8 @@ public class NotePressLoginController extends NotePressBaseController {
                 AuthUser authUser = (AuthUser) response.getData();
                 //检测是否绑定了本站账号
                 NotePressResult br = referService.hasBind(authUser.getSource(), authUser.getUuid());
-                //绑定了就直接登录，设置相关 session 对象
                 if (br.isSuccess()) {
+                    //绑定了就直接登录，设置相关 session 对象
                     if (br.getData() != null && !br.getBoolData()) {
                         Refer referUser = br.getDataBean(Refer.class);
                         String userId = referUser.getReferId();
@@ -240,17 +243,19 @@ public class NotePressLoginController extends NotePressBaseController {
                         removeSessionLastVisitUrl();
                         httpResponse.sendRedirect(lastVisitUrl);
                     }
-                }
-                //如果没绑定，提示绑定并转发至绑定页面
-                else {
-                    String avatar = authUser.getAvatar();
-                    String source = authUser.getSource();
-                    String uuid = authUser.getUuid();
-                    Map<String, Object> pMap = new HashMap<>(3);
-                    pMap.put("avatar", avatar);
-                    pMap.put("source", source);
-                    pMap.put("uuid", uuid);
-                    httpResponse.sendRedirect("/np-bind?p=" + Base64.encode(JSONUtil.toJsonStr(pMap)));
+                    //如果没绑定，提示绑定并转发至绑定页面
+                    else {
+                        String avatar = authUser.getAvatar();
+                        String source = authUser.getSource();
+                        String uuid = authUser.getUuid();
+                        Map<String, Object> pMap = new HashMap<>(3);
+                        pMap.put("avatar", avatar);
+                        pMap.put("source", source);
+                        pMap.put("uuid", uuid);
+                        httpResponse.sendRedirect("/np-bind?p=" + Base64.encode(JSONUtil.toJsonStr(pMap)));
+                    }
+                } else {
+                    throw new NotePressException(br.getMsg());
                 }
             } else {
                 throw new NotePressException(response.getMsg());
@@ -274,7 +279,8 @@ public class NotePressLoginController extends NotePressBaseController {
     @ResponseBody
     public NotePressResult bind(String username, String password,
                                 String source, String uuid, @RequestParam String code) {
-        String googleCode = (String) request.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
+        String googleCode = kaptchaCodeCache.get(Constants.KAPTCHA_SESSION_KEY);
+        kaptchaCodeCache.clear();
         if (code == null) {
             return NotePressResult.createErrorMsg("请输入验证码");
         }

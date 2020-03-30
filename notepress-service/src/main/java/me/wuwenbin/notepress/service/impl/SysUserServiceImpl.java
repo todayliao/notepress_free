@@ -105,7 +105,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //数据库没有找到匹配的用户，说明输入有误，输入错误次数+1
         else {
             passwordRetryCache.put(usernameOrEmail, retryCount + 1);
-            return NotePressResult.createErrorMsg("用户不存在或者密码错误");
+            return NotePressResult.createErrorMsg("用户不存在或者密码错误或已被锁定");
         }
     }
 

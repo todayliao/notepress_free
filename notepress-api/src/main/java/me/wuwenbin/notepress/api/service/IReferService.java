@@ -35,6 +35,7 @@ public interface IReferService extends INotePressService<Refer> {
 
     /**
      * 是否已绑定本站账号
+     *
      * @param source
      * @param uuid
      * @return
