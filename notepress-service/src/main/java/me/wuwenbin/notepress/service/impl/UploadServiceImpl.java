@@ -93,7 +93,7 @@ public class UploadServiceImpl extends ServiceImpl<UploadMapper, Upload> impleme
             UploadMethod uploadMethod = NotePressUploadUtils.getUploadMethod();
 
             //本地服务器上传
-            if (UploadMethod.LOCAL == uploadMethod) {
+            if (UploadMethod.LOCAL == uploadMethod || UploadMethod.INIT == uploadMethod) {
                 Upload u = this.doLocalUpload(multiPartFile, newFileName, uploadParam);
                 int ur = uploadMapper.insert(u);
                 return result(ur, reqType, u.getVirtualPath());

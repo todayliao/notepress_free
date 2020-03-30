@@ -13,6 +13,11 @@ public enum UploadMethod {
     /**
      * 七牛云上传
      */
-    QINIU;
+    QINIU,
+
+    /**
+     * 初始化的时候需要临时上传
+     */
+    INIT;
 
 }

@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +51,7 @@ public class NotePressControllerAdvice extends NotePressBaseController {
         if (!request.getRequestURL().toString().contains("/admin/")) {
             model.addAttribute("cateList", categoryService.list());
             model.addAttribute("contentCount", contentService.count());
-            model.addAttribute("blogWords", contentService.sumContentWords().getData());
+            model.addAttribute("blogWords", Optional.of(contentService.sumContentWords()).orElse(writeJsonOk("")).getData());
             model.addAttribute("runningDays", calcRunningDays());
             model.addAttribute("commentCount", sysNoticeService.count());
         }
@@ -109,8 +106,11 @@ public class NotePressControllerAdvice extends NotePressBaseController {
      */
     private long calcRunningDays() {
         Param startedParam = paramService.getOne(ParamQuery.build(ParamKeyConstant.SYSTEM_INIT_DATETIME));
-        Date init = DateUtil.parse(startedParam.getValue());
-        Date now = DateUtil.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        return DateUtil.between(init, now, DateUnit.DAY);
+        if (startedParam != null) {
+            Date init = DateUtil.parse(startedParam.getValue());
+            Date now = DateUtil.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            return DateUtil.between(init, now, DateUnit.DAY);
+        }
+        return 0;
     }
 }

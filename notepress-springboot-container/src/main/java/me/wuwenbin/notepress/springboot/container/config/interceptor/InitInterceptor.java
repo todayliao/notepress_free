@@ -2,6 +2,7 @@ package me.wuwenbin.notepress.springboot.container.config.interceptor;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import me.wuwenbin.notepress.api.exception.NotePressErrorCode;
 import me.wuwenbin.notepress.api.model.NotePressResult;
 import me.wuwenbin.notepress.api.service.IParamService;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
@@ -27,7 +28,7 @@ public class InitInterceptor implements HandlerInterceptor {
         boolean status = initStatusRr.getBoolData();
         if (!status) {
             JSONObject jsonObject = JSONUtil.createObj();
-            jsonObject.putAll(NotePressResult.createErrorMsg("您还未进行初始化设置！"));
+            jsonObject.putAll(NotePressResult.createError(NotePressErrorCode.InitError, "您还未进行初始化设置！"));
             response.setHeader("Content-Type", "application/json");
             response.setContentType("application/json;charset=UTF-8");
             response.setStatus(HttpServletResponse.SC_OK);

@@ -91,7 +91,9 @@ public class LogInterceptor extends NotePressBaseController implements HandlerIn
                 return true;
             }
             return dbSetList.contains("other")
-                    && (reqUri.contains("/purchase") || reqUri.contains("/note") || reqUri.contains("/message"));
+                    && (reqUri.contains("/purchase") || reqUri.contains("/note")
+                    || reqUri.contains("/message"))||reqUri.contains("/token/ubs")
+                    ||reqUri.contains("/res");
         }
         return false;
     }

@@ -32,6 +32,10 @@ public class NotePressUploadUtils {
      * @return
      */
     public static UploadMethod getUploadMethod() {
+        String uri = NotePressServletUtils.getRequest().getRequestURI();
+        if ("/init/upload".contentEquals(uri)) {
+            return UploadMethod.INIT;
+        }
         Param uploadMethodParam = NotePressUtils.getBean(IParamService.class).getOne(ParamQuery.build(ParamKeyConstant.UPLOAD_TYPE));
         if (uploadMethodParam != null) {
             String uploadMethodInDb = uploadMethodParam.getValue();

@@ -12,6 +12,7 @@ public enum NotePressErrorCode {
     /**
      * 错误码枚举
      */
+    InitError(-1, "初始化错误！"),
     IllegalRequestError(-2, "非法请求"),
     NotLogin(-3, "没有登录或登录过期"),
     BusyError(-4, "系统繁忙"),

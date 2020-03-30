@@ -82,7 +82,7 @@ public class InitBean implements ApplicationListener<ContextRefreshedEvent> {
     private boolean appStartNeedInitDatabase() {
         boolean c1 = paramService.fetchSettingsValByKey("app", "startInit", Boolean.class, false).getBoolData();
         Param p1 = paramService.getOne(ParamQuery.build(ParamKeyConstant.SYSTEM_INIT_STATUS));
-        boolean c2 = p1 != null && StrUtil.isNotEmpty(p1.getValue()) && "0".equals(p1.getValue());
+        boolean c2 = p1 == null || StrUtil.isNotEmpty(p1.getValue()) && "0".equals(p1.getValue());
         return c1 && c2;
     }
 

@@ -21,7 +21,7 @@ public interface ContentMapper extends NotePressMapper<Content> {
      * @return
      */
     @Select("select sum(if(text_content is null,0,length(trim(text_content)))) from np_content")
-    long sumContentWords();
+    Long sumContentWords();
 
     /**
      * 随机文章
