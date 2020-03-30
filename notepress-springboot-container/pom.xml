@@ -16,7 +16,7 @@
     <description>
         项目的启动容器模块，依赖notepress-web模块
     </description>
-    <url>https://github.com/miyakowork/notepress/notepress-springboot-container</url>
+    <url>https://github.com/miyakowork/notepress_free/tree/master/notepress-springboot-container</url>
 
 
     <dependencies>

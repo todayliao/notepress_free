@@ -12,7 +12,7 @@
     <description>
         此模块为项目的视图WEB部分，依赖notepress-service模块
     </description>
-    <url>https://github.com/miyakowork/notepress/notepress-web</url>
+    <url>https://github.com/miyakowork/notepress_free/tree/master/notepress-web</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

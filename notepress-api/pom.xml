@@ -10,7 +10,7 @@
 
     <name>notepress-api</name>
     <description>NotePress 通用对象和接口</description>
-    <url>https://github.com/miyakowork/notepress/notepress-api</url>
+    <url>https://github.com/miyakowork/notepress_free/tree/master/notepress-api</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
