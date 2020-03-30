@@ -252,10 +252,12 @@ public class NotePressLoginController extends NotePressBaseController {
                     pMap.put("uuid", uuid);
                     httpResponse.sendRedirect("/np-bind?p=" + Base64.encode(JSONUtil.toJsonStr(pMap)));
                 }
+            } else {
+                throw new NotePressException(response.getMsg());
             }
-            throw new NotePressException(response.getMsg());
+        } else {
+            throw new NotePressException(authRequestResult.getMsg());
         }
-        throw new NotePressException(authRequestResult.getMsg());
     }
 
 
