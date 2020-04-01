@@ -164,7 +164,7 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
     @Override
     public NotePressResult findContentById(String id) {
         Content content = contentMapper.selectById(id);
-        ContentHelper.handleBasePath(content, false);
+        ContentHelper.handleBasePath(content, true);
         //查询对应的分类
         List<Refer> referCategoryList = referMapper.selectList(ReferQuery.buildBySelfIdAndType(id, ReferTypeEnum.CONTENT_CATEGORY));
         List<Category> categories = referCategoryList.stream().map(refer -> categoryMapper.selectById(refer.getReferId())).collect(Collectors.toList());
