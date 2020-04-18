@@ -1,6 +1,7 @@
 package me.wuwenbin.notepress.web.controllers.api.theme;
 
 import cn.hutool.core.util.StrUtil;
+import com.qiniu.util.Auth;
 import lombok.RequiredArgsConstructor;
 import me.wuwenbin.notepress.api.constants.enums.ReferTypeEnum;
 import me.wuwenbin.notepress.api.model.NotePressResult;
@@ -13,6 +14,7 @@ import me.wuwenbin.notepress.api.service.IReferService;
 import me.wuwenbin.notepress.api.service.IResCateService;
 import me.wuwenbin.notepress.api.service.IResService;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
+import me.wuwenbin.notepress.service.utils.NotePressUploadUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,10 +24,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -48,6 +48,7 @@ public class NotePressResourceController extends NotePressBaseController {
                     .stream().map(Refer::getReferId).collect(Collectors.toList());
             model.addAttribute("userResIds", resIds);
         }
+        model.addAttribute("srn", request.getParameter("srn"));
         return "netdisk";
     }
 
@@ -65,14 +66,7 @@ public class NotePressResourceController extends NotePressBaseController {
         SysUser sessionUser = NotePressSessionUtils.getSessionUser();
         if (sessionUser != null) {
             if (StrUtil.isNotEmpty(ids)) {
-                List<Refer> refers = Arrays.stream(ids.split(","))
-                        .map(id -> Refer.builder()
-                                .referType(ReferTypeEnum.USER_RES).selfId(sessionUser.getId().toString()).referId(id)
-                                .build()
-                                .gmtCreate(LocalDateTime.now()).createBy(sessionUser.getId()))
-                        .collect(Collectors.toList());
-                boolean res = referService.saveBatch(refers);
-                return writeJsonJudgedBool(res, "购买成功！", "购买失败！");
+                return writeJson(() -> resService.purchaseRes(Arrays.asList(ids.split(","))));
             }
         }
         return writeJsonErrorMsg("购买失败！");
@@ -82,5 +76,15 @@ public class NotePressResourceController extends NotePressBaseController {
     @ResponseBody
     public NotePressResult cateTree() {
         return writeJson(resCateService::findCateTree);
+    }
+
+    @GetMapping("/getUrl")
+    @ResponseBody
+    public NotePressResult getUrl(String hash) {
+        Auth auth = NotePressUploadUtils.getQiniuAuth();
+        //半小时有效期
+        long expireSec = 1800;
+        String finalUrl = auth.privateDownloadUrl(hash, expireSec);
+        return writeJsonOk(finalUrl);
     }
 }

@@ -1,4 +1,4 @@
-package me.wuwenbin.notepress.springboot.container.init;
+package me.wuwenbin.notepress.springboot.container.listener;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
@@ -37,7 +37,7 @@ import java.util.Map;
 @Component
 @Order(1)
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
-public class InitBean implements ApplicationListener<ContextRefreshedEvent> {
+public class StartInitListener implements ApplicationListener<ContextRefreshedEvent> {
 
     private final IParamService paramService;
     @Qualifier("notePressSetting")
@@ -205,6 +205,7 @@ public class InitBean implements ApplicationListener<ContextRefreshedEvent> {
      */
     private void clearSession() {
         mongoTemplate.dropCollection("np_sys_sessions");
+        mongoTemplate.dropCollection("np_user_logged_in");
     }
 
 }

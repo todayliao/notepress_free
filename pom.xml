@@ -12,7 +12,7 @@
 
     <groupId>me.wuwenbin</groupId>
     <artifactId>notepress-parent</artifactId>
-    <version>v2020.002</version>
+    <version>v2020.003_0418</version>
     <modules>
         <module>notepress-api</module>
         <module>notepress-service</module>

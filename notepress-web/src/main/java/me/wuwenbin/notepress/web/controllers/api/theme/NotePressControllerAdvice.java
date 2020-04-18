@@ -105,9 +105,12 @@ public class NotePressControllerAdvice extends NotePressBaseController {
      * @return
      */
     private long calcRunningDays() {
-        Param startedParam = paramService.getOne(ParamQuery.build(ParamKeyConstant.SYSTEM_INIT_DATETIME));
-        if (startedParam != null) {
-            Date init = DateUtil.parse(startedParam.getValue());
+        Param startParam = paramService.getOne(ParamQuery.build(ParamKeyConstant.SYSTEM_OPERATION_DATETIME));
+        if (startParam != null) {
+            if (StrUtil.isEmpty(startParam.getValue())) {
+                startParam = paramService.getOne(ParamQuery.build(ParamKeyConstant.SYSTEM_INIT_DATETIME));
+            }
+            Date init = DateUtil.parse(startParam.getValue());
             Date now = DateUtil.parse(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             return DateUtil.between(init, now, DateUnit.DAY);
         }

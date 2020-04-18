@@ -1,14 +1,19 @@
 package me.wuwenbin.notepress.web.controllers.api.common;
 
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.wuwenbin.notepress.api.constants.ParamKeyConstant;
 import me.wuwenbin.notepress.api.constants.UploadConstant;
 import me.wuwenbin.notepress.api.constants.enums.FileTypeEnum;
+import me.wuwenbin.notepress.api.constants.enums.UploadTypeEnum;
 import me.wuwenbin.notepress.api.model.NotePressResult;
 import me.wuwenbin.notepress.api.model.entity.Param;
+import me.wuwenbin.notepress.api.model.uploader.LayUploader;
+import me.wuwenbin.notepress.api.query.SysUserQuery;
 import me.wuwenbin.notepress.api.service.IParamService;
+import me.wuwenbin.notepress.api.service.ISysUserService;
 import me.wuwenbin.notepress.api.service.IUploadService;
 import me.wuwenbin.notepress.api.utils.NotePressFileUtils;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
@@ -24,6 +29,7 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * created by Wuwenbin on 2018/8/3 at 22:06
@@ -37,6 +43,7 @@ public class UploadController extends NotePressBaseController {
 
     private final IUploadService uploadService;
     private final IParamService paramService;
+    private final ISysUserService userService;
 
     /**
      * 未登录的上传接口
@@ -79,8 +86,20 @@ public class UploadController extends NotePressBaseController {
             long maxSizeB = param.getValue() != null ? Long.parseLong(param.getValue()) * 1024 : 100 * 1024 * 1024;
             if (file.getSize() <= maxSizeB) {
                 Map<String, Object> uploadParams = new HashMap<>(4);
-                uploadParams.put(UploadConstant.REQUEST_PARAM_USER_ID, NotePressSessionUtils.getSessionUser().getId());
-                return uploadService.doUpload(file, reqType, NotePressUploadUtils.setUploadParams(uploadParams));
+                long userId = Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getId();
+                uploadParams.put(UploadConstant.REQUEST_PARAM_USER_ID, userId);
+                NotePressResult npr = uploadService.doUpload(file, reqType, NotePressUploadUtils.setUploadParams(uploadParams));
+                String uploadCode = request.getParameter("code");
+                if (StrUtil.isNotEmpty(uploadCode) &&
+                        UploadTypeEnum.USER_MODIFY_AVATAR.getCode() == Integer.parseInt(uploadCode) &&
+                        npr.isSuccess()) {
+                    LayUploader uploader = npr.getDataBean(LayUploader.class);
+                    String imgSrc = MapUtil.getStr(uploader.getData(), "src");
+                    userService.update(SysUserQuery.buildUpdate("avatar", imgSrc).eq("id", userId));
+                    NotePressSessionUtils.getSessionUser().setAvatar(imgSrc);
+                    npr.setMsg("上传头像成功！");
+                }
+                return npr;
             } else {
                 float a = (float) maxSizeB / 1024 / 1024;
                 NumberFormat nf = NumberFormat.getNumberInstance();

@@ -231,7 +231,6 @@ public class NotePressUtils implements BeanFactoryPostProcessor, ApplicationCont
         return servletContext;
     }
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         NotePressUtils.applicationContext = applicationContext;

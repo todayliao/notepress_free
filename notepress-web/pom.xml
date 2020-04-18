@@ -6,7 +6,7 @@
 
     <groupId>me.wuwenbin</groupId>
     <artifactId>notepress-web</artifactId>
-    <version>v2020.002</version>
+    <version>v2020.003_0418</version>
 
     <name>notepress-web</name>
     <description>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>me.wuwenbin</groupId>
             <artifactId>notepress-service</artifactId>
-            <version>v2020.002</version>
+            <version>v2020.003_0418</version>
         </dependency>
 
         <dependency>

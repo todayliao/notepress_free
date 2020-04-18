@@ -2,6 +2,7 @@ package me.wuwenbin.notepress.web.controllers.api.theme;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import me.wuwenbin.notepress.api.constants.enums.ReferTypeEnum;
 import me.wuwenbin.notepress.api.model.NotePressResult;
 import me.wuwenbin.notepress.api.model.entity.Dictionary;
+import me.wuwenbin.notepress.api.model.entity.Param;
 import me.wuwenbin.notepress.api.model.entity.Res;
 import me.wuwenbin.notepress.api.model.entity.system.SysNotice;
 import me.wuwenbin.notepress.api.model.entity.system.SysUser;
@@ -21,14 +23,13 @@ import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +46,7 @@ public class NotePressUbsController extends NotePressBaseController {
     private final IContentService contentService;
     private final IReferService referService;
     private final IResService resService;
+    private final IParamService paramService;
 
     @GetMapping
     public String index(Model model) {
@@ -112,5 +114,22 @@ public class NotePressUbsController extends NotePressBaseController {
         }
         IPage<Res> rPage = resService.page(page, Wrappers.<Res>query().in("id", resIds));
         return writeJsonOk(rPage);
+    }
+
+    @PostMapping("/create/order")
+    @ResponseBody
+    public String createOrder(@RequestParam BigDecimal price, @RequestParam String type) {
+        Param domainParam = toBeanNull(paramService.fetchParamByName("recharge_server_domain"), Param.class);
+        Param keyParam = toBeanNull(paramService.fetchParamByName("recharge_sign_secretKey"), Param.class);
+        if (domainParam != null && keyParam != null) {
+            String domain = domainParam.getValue();
+            String key = keyParam.getValue();
+            String url = domain + "/pay/order?userId={}&type={}&price={}&sign={}&_t=" + System.currentTimeMillis();
+            long userId = Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getId();
+            String sign = SecureUtil.md5(SecureUtil.md5(price + type) + key);
+            url = StrUtil.format(url, userId, type, price, sign);
+            return url;
+        }
+        return null;
     }
 }

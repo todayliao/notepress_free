@@ -5,7 +5,8 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.SecureUtil;
+import cn.hutool.http.HtmlUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.code.kaptcha.Constants;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import me.wuwenbin.notepress.api.service.IParamService;
 import me.wuwenbin.notepress.api.service.IReferService;
 import me.wuwenbin.notepress.api.service.ISysUserService;
 import me.wuwenbin.notepress.api.utils.NotePressIpUtils;
+import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.service.bo.RegisterUserBo;
 import me.wuwenbin.notepress.service.facade.MailFacade;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
@@ -36,6 +38,7 @@ import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -49,6 +52,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * created by Wuwenbin on 2019/12/4 at 1:42 下午
@@ -69,6 +73,8 @@ public class NotePressLoginController extends NotePressBaseController {
     private final Cache<String, String> mailCodeCache;
     @Qualifier("kaptchaCodeCache")
     private final Cache<String, String> kaptchaCodeCache;
+
+    private static final MongoTemplate MONGO_TEMPLATE = NotePressUtils.getBean(MongoTemplate.class);
 
 
     /**
@@ -157,7 +163,7 @@ public class NotePressLoginController extends NotePressBaseController {
                 SysUser reqUser = SysUser.builder().username(userBo.getNpUsername()).email(userBo.getNpMail()).build();
                 reqUser.setPassword(userBo.getNpPassword());
                 reqUser.setNickname(userBo.getNpNickname());
-                reqUser.setAvatar(basePath(request) + "static/assets/img/noavatar.png");
+                reqUser.setAvatar("/static/assets/img/noavatar.png");
                 return sysUserService.doReg(reqUser);
             } else {
                 return writeJsonErrorMsg("注册失败，验证码失效！");
@@ -240,6 +246,7 @@ public class NotePressLoginController extends NotePressBaseController {
                         //根据用户 id 查询本站的账号信息，并设置相关 session
                         SysUser sessionUser = sysUserService.getById(userId);
                         String lastVisitUrl = setSessionReturnLastVisitUrl(sessionUser, null);
+                        MONGO_TEMPLATE.insert(sessionUser, "np_user_logged_in");
                         removeSessionLastVisitUrl();
                         httpResponse.sendRedirect(lastVisitUrl);
                     }
@@ -278,7 +285,7 @@ public class NotePressLoginController extends NotePressBaseController {
     @PostMapping("/bind")
     @ResponseBody
     public NotePressResult bind(String username, String password,
-                                String source, String uuid, @RequestParam String code) {
+                                String source, String uuid, String avatar, @RequestParam String code) {
         String googleCode = kaptchaCodeCache.get(Constants.KAPTCHA_SESSION_KEY);
         kaptchaCodeCache.clear();
         if (code == null) {
@@ -292,7 +299,7 @@ public class NotePressLoginController extends NotePressBaseController {
         if (loginResult.isSuccess()) {
             Long userId = loginResult.getDataBean(SysUser.class).getId();
             //开始执行绑定
-            NotePressResult isSavedR = referService.bind(userId, uuid, source);
+            NotePressResult isSavedR = referService.bind(userId, uuid, source, HtmlUtil.unescape(HtmlUtil.unescape(avatar)));
             if (isSavedR.isSuccess()) {
                 //绑定成功跳转至登录前的最后访问的页面
                 Object lastVisitUrl = session.getAttribute(SESSION_LAST_VISIT_URL_KEY);

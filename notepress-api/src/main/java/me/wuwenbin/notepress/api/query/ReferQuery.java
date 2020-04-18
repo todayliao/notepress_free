@@ -16,6 +16,13 @@ public class ReferQuery extends BaseQuery {
                 .eq("refer_type", referTypeEnum.getValue());
     }
 
+    public static QueryWrapper<Refer> buildByUserAndRes(Long userId, String resId) {
+        return Wrappers.<Refer>query()
+                .eq("self_id", userId)
+                .eq("refer_id", resId)
+                .eq("refer_type", ReferTypeEnum.USER_RES.getValue());
+    }
+
     public static QueryWrapper<Refer> buildByUser(String userId) {
         return Wrappers.<Refer>query()
                 .eq("refer_id", userId)

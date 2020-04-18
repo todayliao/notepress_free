@@ -9,6 +9,7 @@ import me.wuwenbin.notepress.api.model.entity.Refer;
 import me.wuwenbin.notepress.api.model.entity.system.SysUser;
 import me.wuwenbin.notepress.api.service.IReferService;
 import me.wuwenbin.notepress.service.mapper.ReferMapper;
+import me.wuwenbin.notepress.service.mapper.SysUserMapper;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 public class ReferServiceImpl extends ServiceImpl<ReferMapper, Refer> implements IReferService {
 
     private final ReferMapper referMapper;
+    private final SysUserMapper userMapper;
 
     @Override
     public NotePressResult hasBind(String source, String uuid) {
@@ -41,7 +43,7 @@ public class ReferServiceImpl extends ServiceImpl<ReferMapper, Refer> implements
     }
 
     @Override
-    public NotePressResult bind(long userId, String uuid, String source) {
+    public NotePressResult bind(long userId, String uuid, String source, String avatar) {
         //检测本站账号绑定
         String findIsBindSql = "select count(1) from np_refer where refer_type = 'third_user' and refer_id = ? and json_extract(refer_extra,'$.source') = ?;";
         int cnt = referMapper.queryNumberByArray(findIsBindSql, Integer.class, userId, source);
@@ -56,6 +58,7 @@ public class ReferServiceImpl extends ServiceImpl<ReferMapper, Refer> implements
                         genReferExtra(ReferTypeEnum.THIRD_USER, source),
                         LocalDateTime.now(), sessionUser != null ? sessionUser.getId() : null);
                 if (referCnt == 1) {
+                    userMapper.updateById(SysUser.builder().id(userId).avatar(avatar).build());
                     return NotePressResult.createOk("绑定成功！", true);
                 } else {
                     return NotePressResult.createErrorMsg("绑定失败！");

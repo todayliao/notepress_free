@@ -36,11 +36,22 @@ public class AdminResController extends NotePressBaseController {
 
     @PostMapping("/upload")
     public NotePressResult upload(@RequestParam(value = UploadConstant.FORM_NAME_QINIU) MultipartFile file,
-                                  String coin, String remark, String cateIdsStr) {
+                                  Res res, String cateIdsStr) {
         if (StrUtil.isEmpty(cateIdsStr)) {
             return writeJsonErrorMsg("请选择一个资源分类！");
         }
-        return writeJson(() -> resService.uploadRes(file, NumberUtil.parseInt(coin), remark, Arrays.asList(cateIdsStr.split(","))));
+        if (file == null) {
+            return writeJsonErrorMsg("上传文件不能为空！");
+        }
+        return writeJson(() -> resService.uploadRes(file, res, Arrays.asList(cateIdsStr.split(","))));
+    }
+
+    @PostMapping("/upload3")
+    public NotePressResult upload3(Res res, String cateIdsStr) {
+        if (StrUtil.isEmpty(cateIdsStr)) {
+            return writeJsonErrorMsg("请选择一个资源分类！");
+        }
+        return writeJson(() -> resService.uploadRes(null, res, Arrays.asList(cateIdsStr.split(","))));
     }
 
     @PostMapping("/delete")
@@ -49,10 +60,11 @@ public class AdminResController extends NotePressBaseController {
     }
 
     @PostMapping("/updateFileProp")
-    public NotePressResult updateFileName(String id, String coin, String remark) {
+    public NotePressResult updateFileName(String id, String coin, String remark, String authCode) {
         boolean res = resService.update(Wrappers.<Res>update()
                 .set(StrUtil.isNotEmpty(coin) && NumberUtil.isInteger(coin), "coin", coin)
                 .set(StrUtil.isNotEmpty(remark), "remark", remark)
+                .set(StrUtil.isNotEmpty(authCode), "auth_code", authCode)
                 .eq("id", id));
         return writeJsonJudgedBool(res, "修改成功！", "修改失败！");
     }

@@ -47,6 +47,7 @@ public class NotePressSessionUtils {
         } else {
             HttpSession session = NotePressServletUtils.getSession();
             session.setAttribute(NotePressConstants.SESSION_USER_KEY, sessionUser);
+            session.setMaxInactiveInterval(7200);
         }
     }
 
@@ -58,7 +59,10 @@ public class NotePressSessionUtils {
                     NotePressSession.class, "np_sys_sessions");
         } else {
             HttpSession session = NotePressServletUtils.getSession();
+            SysUser sessionUser = (SysUser) session.getAttribute(NotePressConstants.SESSION_USER_KEY);
             session.removeAttribute(NotePressConstants.SESSION_USER_KEY);
+            session.invalidate();
+            MONGO_TEMPLATE.remove(sessionUser, "np_user_logged_in");
         }
     }
 

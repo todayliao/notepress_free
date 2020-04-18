@@ -231,10 +231,10 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
                         finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(resultContentIdSet), "id", resultContentIdSet);
                     }
                 } else {
-                    finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet), "id", contentIdSet);
+                    finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet) || StrUtil.isEmpty(contentPageQuery.getCates()), "id", contentIdSet);
                 }
             } else {
-                finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet), "id", contentIdSet);
+                finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet) || StrUtil.isEmpty(contentPageQuery.getCates()), "id", contentIdSet);
             }
 
 

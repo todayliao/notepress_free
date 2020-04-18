@@ -7,8 +7,10 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import me.wuwenbin.notepress.api.model.jwt.JwtHelper;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
+import me.wuwenbin.notepress.springboot.container.listener.NotePressSessionListener;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -100,6 +102,13 @@ public class SpringBeanConfig {
         Config config = new Config(properties);
         kaptcha.setConfig(config);
         return kaptcha;
+    }
+
+    @Bean
+    public ServletListenerRegistrationBean<NotePressSessionListener> servletListenerRegistrationBean() {
+        ServletListenerRegistrationBean<NotePressSessionListener> srb = new ServletListenerRegistrationBean<>();
+        srb.setListener(new NotePressSessionListener());
+        return srb;
     }
 
 }

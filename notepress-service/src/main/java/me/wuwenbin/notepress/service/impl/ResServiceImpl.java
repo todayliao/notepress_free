@@ -1,7 +1,6 @@
 package me.wuwenbin.notepress.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -21,6 +20,7 @@ import me.wuwenbin.notepress.api.constants.enums.ReferTypeEnum;
 import me.wuwenbin.notepress.api.exception.NotePressErrorCode;
 import me.wuwenbin.notepress.api.exception.NotePressException;
 import me.wuwenbin.notepress.api.model.NotePressResult;
+import me.wuwenbin.notepress.api.model.entity.Deal;
 import me.wuwenbin.notepress.api.model.entity.Param;
 import me.wuwenbin.notepress.api.model.entity.Refer;
 import me.wuwenbin.notepress.api.model.entity.Res;
@@ -30,10 +30,8 @@ import me.wuwenbin.notepress.api.model.layui.query.LayuiTableQuery;
 import me.wuwenbin.notepress.api.model.page.NotePressPage;
 import me.wuwenbin.notepress.api.query.ReferQuery;
 import me.wuwenbin.notepress.api.service.IResService;
-import me.wuwenbin.notepress.service.mapper.ParamMapper;
-import me.wuwenbin.notepress.service.mapper.ReferMapper;
-import me.wuwenbin.notepress.service.mapper.ResCateMapper;
-import me.wuwenbin.notepress.service.mapper.ResMapper;
+import me.wuwenbin.notepress.api.utils.NotePressIdUtils;
+import me.wuwenbin.notepress.service.mapper.*;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.service.utils.NotePressUploadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +60,7 @@ public class ResServiceImpl extends ServiceImpl<ResMapper, Res> implements IResS
     private final ResCateMapper resCateMapper;
     private final ReferMapper referMapper;
     private final ParamMapper paramMapper;
+    private final DealMapper dealMapper;
 
     @Override
     public NotePressResult findResList(IPage<Res> resPage, LayuiTableQuery<Res> layuiTableQuery) {
@@ -90,8 +89,13 @@ public class ResServiceImpl extends ServiceImpl<ResMapper, Res> implements IResS
     }
 
     @Override
-    public NotePressResult uploadRes(MultipartFile multipartFile, int coin, String remark, List<String> cateIds) {
-        Res res = this.doQiniuUpload(multipartFile, coin, remark);
+    public NotePressResult uploadRes(MultipartFile multipartFile, Res resFile, List<String> cateIds) {
+        Res res;
+        if (multipartFile != null) {
+            res = this.doQiniuUpload(multipartFile, resFile);
+        } else {
+            res = this.doThirdUpload(resFile);
+        }
         if (res != null) {
             int r = resMapper.insert(res);
             if (r == 1) {
@@ -150,31 +154,52 @@ public class ResServiceImpl extends ServiceImpl<ResMapper, Res> implements IResS
             }
         }
         SysUser sessionUser = NotePressSessionUtils.getSessionUser();
-        if (sessionUser == null || !sessionUser.getAdmin()) {
-            List<Res> newResList = resPage.getTResult().stream().peek(res -> {
-                String hash = res.getResHash().substring(0, res.getResHash().indexOf("."));
-                String ext = res.getResHash().substring(res.getResHash().indexOf("."));
-                res.setResHash(
-                        hash.length() < 3 ?
-                                StrUtil.repeat("*", 3) + ext :
-                                hash.substring(0, 3).concat(StrUtil.repeat("*", hash.length() - 3).concat(ext)));
-                if (StrUtil.isNotEmpty(res.getRemark())) {
-                    int index = res.getRemark().indexOf(".");
-                    if (index > 0) {
-                        String remark = res.getRemark().substring(0, index);
-                        res.setRemark(remark.length() < 3 ?
-                                StrUtil.repeat("*", 3) :
-                                remark.substring(0, 3).concat(StrUtil.repeat("*", remark.length() - 3)));
+
+        List<Res> newResList = resPage.getTResult().stream().peek(res -> {
+            if (StrUtil.isNotEmpty(res.getAuthCode())) {
+                if (sessionUser == null) {
+                    res.setAuthCode(StrUtil.repeat("*", 4));
+                } else {
+                    int cnt = referMapper.selectCount(ReferQuery.buildByUserAndRes(sessionUser.getId(), res.getId()));
+                    if (!sessionUser.getAdmin() && cnt == 0) {
+                        res.setAuthCode(StrUtil.repeat("*", 4));
                     }
                 }
-            }).collect(Collectors.toList());
-            resPage.setResult(newResList);
-            resPage.setTResult(newResList);
-            resPage.setRawResult(newResList);
-        }
+            }
+        }).collect(Collectors.toList());
+        resPage.setResult(newResList);
+        resPage.setTResult(newResList);
+        resPage.setRawResult(newResList);
+
         return NotePressResult.createOkData(resPage);
     }
 
+    @Override
+    public NotePressResult purchaseRes(List<String> resIds) {
+        SysUser sessionUser = NotePressSessionUtils.getSessionUser();
+        if (sessionUser != null) {
+            try {
+                int sumCoin = resMapper.selectSumCoinByIds(resIds);
+                int userCoin = dealMapper.selectSumCoinByIds(sessionUser.getId());
+                if (userCoin >= sumCoin) {
+                    resIds.stream().map(id -> Refer.builder()
+                            .referType(ReferTypeEnum.USER_RES).selfId(sessionUser.getId().toString()).referId(id).build()
+                            .gmtCreate(LocalDateTime.now()).createBy(sessionUser.getId())).forEach(referMapper::insert);
+                    resIds.stream().map(resMapper::selectById)
+                            .forEach(res -> dealMapper.insert(
+                                    Deal.builder().
+                                            dealAmount(-res.getCoin()).userId(sessionUser.getId()).dealTargetId(res.getId())
+                                            .build()));
+                    return NotePressResult.createOkMsg("购买成功！");
+                } else {
+                    return NotePressResult.createErrorMsg("购买失败，原因：硬币余额不足！");
+                }
+            } catch (Exception e) {
+                return NotePressResult.createErrorMsg("购买失败，原因：" + e.getMessage());
+            }
+        }
+        return NotePressResult.createErrorMsg("购买失败！");
+    }
 
     //============================私有方法==============================
 
@@ -184,7 +209,7 @@ public class ResServiceImpl extends ServiceImpl<ResMapper, Res> implements IResS
      * @param file 文件
      * @return Response
      */
-    private Res doQiniuUpload(MultipartFile file, int coin, String remark) {
+    private Res doQiniuUpload(MultipartFile file, Res resFile) {
         try {
             String fileName = file.getOriginalFilename();
             //构造一个带指定Zone对象的配置类
@@ -205,7 +230,7 @@ public class ResServiceImpl extends ServiceImpl<ResMapper, Res> implements IResS
                 String src = qiniuDomain + "/" + generateFileName;
 
                 //插入到数据库中
-                return newUpload(generateFileName, src, file.getSize(), coin, remark);
+                return newUpload(generateFileName, src, file.getSize(), resFile);
             } else {
                 throw new NotePressException("==> 上传文件至七牛云失败，信息：" + res.error);
             }
@@ -223,6 +248,21 @@ public class ResServiceImpl extends ServiceImpl<ResMapper, Res> implements IResS
         }
     }
 
+    /**
+     * 非七牛云上传，使用第三方链接（如百度网盘等）
+     *
+     * @param resFile
+     * @return
+     */
+    private Res doThirdUpload(Res resFile) {
+        String fileName = resFile.getResHash();
+        int c = resMapper.selectCount(Wrappers.<Res>query().eq("res_hash", fileName));
+        if (c > 0) {
+            fileName = System.currentTimeMillis() + fileName;
+        }
+        return newUpload(fileName, resFile.getResUrl(), -1, resFile);
+    }
+
     //=============================静态私有方法=======================
 
     /**
@@ -231,16 +271,20 @@ public class ResServiceImpl extends ServiceImpl<ResMapper, Res> implements IResS
      * @param fileHash
      * @param fileUrl
      * @param fileByteSize
+     * @param resFile
      * @return
      */
-    private Res newUpload(String fileHash, String fileUrl, double fileByteSize, int coin, String remark) {
-        Res res = Res.builder().id(IdUtil.objectId()).resHash(fileHash).resFsizeBytes(fileByteSize).resUrl(fileUrl).coin(coin).build();
+    private Res newUpload(String fileHash, String fileUrl, double fileByteSize, Res resFile) {
+        Res res = Res.builder().id(NotePressIdUtils.nextId()).resHash(fileHash)
+                .resFsizeBytes(fileByteSize).resUrl(fileUrl).coin(resFile.getCoin())
+                .resIntroUrl(resFile.getResIntroUrl()).authCode(resFile.getAuthCode())
+                .build();
         //上传的一些说明
-        if (StringUtils.isEmpty(remark)) {
-            res.setRemark(remark);
+        if (StringUtils.isEmpty(resFile.getRemark())) {
+            res.setRemark(resFile.getRemark());
         }
         //插入到数据库中
         Long userId = Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getId();
-        return res.createBy(userId).gmtCreate(LocalDateTime.now()).remark(remark);
+        return res.createBy(userId).gmtCreate(LocalDateTime.now()).remark(resFile.getRemark());
     }
 }

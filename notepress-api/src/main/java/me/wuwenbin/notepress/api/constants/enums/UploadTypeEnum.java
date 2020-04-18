@@ -23,7 +23,8 @@ public enum UploadTypeEnum implements IEnum<Integer> {
     ADMIN_CONTENT_ADD(8, "添加内容封面上传"),
     ADMIN_CONTENT_EDITORMD_UPLOAD(9, "editorMD上传文件/图片"),
     ADMIN_CONTENT_KINDEDITOR_UPLOAD(10, "KindEditor上传文件/图片"),
-    THEME_DEF_CONFIG(11, "默认主题上传的文件/图片");
+    THEME_DEF_CONFIG(11, "默认主题上传的文件/图片"),
+    USER_MODIFY_AVATAR(12, "用户自己修改头像");
 
     @Getter
     private int code;
@@ -61,6 +62,8 @@ public enum UploadTypeEnum implements IEnum<Integer> {
                 return ADMIN_CONTENT_KINDEDITOR_UPLOAD;
             case 11:
                 return THEME_DEF_CONFIG;
+            case 12:
+                return USER_MODIFY_AVATAR;
             default:
                 return UNKNOWN;
         }

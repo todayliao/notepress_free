@@ -3,6 +3,7 @@ package me.wuwenbin.notepress.api.model.entity.system;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import me.wuwenbin.notepress.api.annotation.query.SimpleCondition;
 import me.wuwenbin.notepress.api.annotation.query.WrapperCondition;
 import me.wuwenbin.notepress.api.model.entity.base.BaseEntity;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
+@ToString
 public class SysUser extends BaseEntity<SysUser> {
 
     private Long id;

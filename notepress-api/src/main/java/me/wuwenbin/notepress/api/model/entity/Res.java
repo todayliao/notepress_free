@@ -24,4 +24,13 @@ public class Res extends BaseEntity<Res> {
     private String resUrl;
     private Double resFsizeBytes;
     private Integer coin;
+    /**
+     * 资源简介链接
+     */
+    private String resIntroUrl;
+
+    /**
+     * 授权码（比如百度网盘的提取码之类的
+     */
+    private String authCode;
 }

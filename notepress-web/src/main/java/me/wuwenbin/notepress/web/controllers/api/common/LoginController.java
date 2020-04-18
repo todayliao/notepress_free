@@ -10,11 +10,13 @@ import me.wuwenbin.notepress.api.model.entity.system.SysUser;
 import me.wuwenbin.notepress.api.model.jwt.JwtHelper;
 import me.wuwenbin.notepress.api.service.ISysUserService;
 import me.wuwenbin.notepress.api.utils.NotePressIpUtils;
+import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.service.utils.NotePressJwtUtils;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,11 +30,11 @@ import java.util.Objects;
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class LoginController extends NotePressBaseController {
 
+    private static final MongoTemplate MONGO_TEMPLATE = NotePressUtils.getBean(MongoTemplate.class);
     private final ISysUserService userService;
     private final JwtHelper jwtHelper;
     @Qualifier("kaptchaCodeCache")
     private final Cache<String, String> kaptchaCodeCache;
-
 
     /**
      * 后台管理/网站用户登录
@@ -75,6 +77,7 @@ public class LoginController extends NotePressBaseController {
                 String lastVisitUrl = setSessionReturnLastVisitUrl(sessionUser, null);
                 loginResponse.addExtra("url", lastVisitUrl);
                 NotePressSessionUtils.setSessionUser(sessionUser, null);
+                MONGO_TEMPLATE.insert(sessionUser, "np_user_logged_in");
             }
         } else {
             loginResponse = NotePressResult.createErrorMsg(loginResult.getMsg());

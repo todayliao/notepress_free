@@ -30,12 +30,10 @@ public interface IResService extends INotePressService<Res> {
      * 上传资源到七牛云
      *
      * @param multipartFile
-     * @param coin
-     * @param remark
      * @param cateIds
      * @return
      */
-    NotePressResult uploadRes(MultipartFile multipartFile, int coin, String remark, List<String> cateIds);
+    NotePressResult uploadRes(MultipartFile multipartFile, Res res, List<String> cateIds);
 
     /**
      * 删除资源，七牛云的也一起删除
@@ -54,5 +52,13 @@ public interface IResService extends INotePressService<Res> {
      * @return
      */
     NotePressResult findResList(NotePressPage<Res> resPage, String cateId, String resName);
+
+    /**
+     * 购买资源
+     *
+     * @param resIds
+     * @return
+     */
+    NotePressResult purchaseRes(List<String> resIds);
 
 }

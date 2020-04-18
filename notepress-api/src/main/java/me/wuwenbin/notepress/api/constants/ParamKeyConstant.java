@@ -11,6 +11,11 @@ public interface ParamKeyConstant {
     String SYSTEM_INIT_DATETIME = "system_init_datetime";
 
     /**
+     * 系统运营开始时间
+     */
+    String SYSTEM_OPERATION_DATETIME = "system_operation_datetime";
+
+    /**
      * 系统启动时间参数key
      */
     String SYSTEM_STARTED_DATETIME = "system_started_datetime";

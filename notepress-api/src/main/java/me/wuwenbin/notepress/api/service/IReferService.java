@@ -48,7 +48,8 @@ public interface IReferService extends INotePressService<Refer> {
      * @param userId
      * @param uuid
      * @param source
+     * @param avatar
      * @return
      */
-    NotePressResult bind(long userId, String uuid, String source);
+    NotePressResult bind(long userId, String uuid, String source,String avatar);
 }

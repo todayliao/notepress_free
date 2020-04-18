@@ -2,6 +2,7 @@
 system_started_datetime = 系统最近一次的启动时间
 system_init_datetime = 系统初始化时间
 system_init_status = 系统初始化状态：0->未初始化，1->已初始化,0
+system_operation_datetime = 网站运营开始时间，在网站的顶部显示的统计开始时间节点
 
 
 [0]
@@ -49,6 +50,9 @@ admin_global_avatar = 站长/管理员的头像,
 admin_qrcode_alipay = 支付宝二维码,
 admin_qrcode_wechat = 微信支付二维码,
 
+recharge_server_domain = 充值服务的域名/ip地址
+recharge_sign_secretKey = 校对密钥，需要和充值微服务端那边设置的一样，没有请忽略
+
 
 [2]
 #一些开关设置，0表示不开启，1表示开启
@@ -59,3 +63,4 @@ switch_user_reg = 是否开放用户注册,0
 switch_visit_log = 是否开启访问统计,0
 switch_qq_login = 是否开启第三方QQ登录,0
 switch_github_login = 是否开启第三方Github登录,0
+switch_recharge_server = 是否开启自动充值服务,0
