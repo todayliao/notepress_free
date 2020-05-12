@@ -9,12 +9,12 @@ import me.wuwenbin.notepress.api.model.entity.Param;
 import me.wuwenbin.notepress.api.model.entity.system.SysLog;
 import me.wuwenbin.notepress.api.model.entity.system.SysUser;
 import me.wuwenbin.notepress.api.service.IParamService;
+import me.wuwenbin.notepress.api.service.ISysLogService;
 import me.wuwenbin.notepress.api.utils.NotePressIpUtils;
 import me.wuwenbin.notepress.api.utils.NotePressServletUtils;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -33,8 +33,8 @@ import java.util.List;
  */
 public class LogInterceptor extends NotePressBaseController implements HandlerInterceptor {
 
-    private IParamService paramService = NotePressUtils.getBean(IParamService.class);
-    private MongoTemplate mongoTemplate = NotePressUtils.getBean(MongoTemplate.class);
+    private final IParamService paramService = NotePressUtils.getBean(IParamService.class);
+    private final ISysLogService sysLogService = NotePressUtils.getBean(ISysLogService.class);
 
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) {
@@ -50,7 +50,7 @@ public class LogInterceptor extends NotePressBaseController implements HandlerIn
                             .ipAddr(ipAddr)
                             .ipInfo(getIpInfo(ipAddr))
                             .time(LocalDateTime.now())
-                            .url(request.getRequestURL().toString())
+                            .url(request.getRequestURI())
                             .userAgent(request.getHeader("User-Agent"))
                             .requestMethod(request.getMethod())
                             .contentType(request.getContentType())
@@ -69,7 +69,7 @@ public class LogInterceptor extends NotePressBaseController implements HandlerIn
                     }
                     Browser browser = UserAgentUtil.parse(logger.getUserAgent()).getBrowser();
                     logger.setBrowser(UserAgentInfo.NameUnknown.equals(browser.getName()) ? "脚本/搜索引擎/爬虫等" : browser.getName());
-                    mongoTemplate.insert(logger, "np_sys_log");
+                    sysLogService.save(logger);
                 }
             }
         }
@@ -92,8 +92,8 @@ public class LogInterceptor extends NotePressBaseController implements HandlerIn
             }
             return dbSetList.contains("other")
                     && (reqUri.contains("/purchase") || reqUri.contains("/note")
-                    || reqUri.contains("/message"))||reqUri.contains("/token/ubs")
-                    ||reqUri.contains("/res");
+                    || reqUri.contains("/message")) || reqUri.contains("/token/ubs")
+                    || reqUri.contains("/res");
         }
         return false;
     }

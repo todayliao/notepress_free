@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import me.wuwenbin.notepress.api.constants.ParamKeyConstant;
 import me.wuwenbin.notepress.api.constants.enums.ReferTypeEnum;
 import me.wuwenbin.notepress.api.model.NotePressResult;
 import me.wuwenbin.notepress.api.model.entity.Dictionary;
@@ -18,6 +19,7 @@ import me.wuwenbin.notepress.api.model.entity.system.SysNotice;
 import me.wuwenbin.notepress.api.model.entity.system.SysUser;
 import me.wuwenbin.notepress.api.query.ReferQuery;
 import me.wuwenbin.notepress.api.service.*;
+import me.wuwenbin.notepress.api.service.plugin.pay.IWxpayQrCodeService;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,7 @@ public class NotePressUbsController extends NotePressBaseController {
     private final IReferService referService;
     private final IResService resService;
     private final IParamService paramService;
+    private final IWxpayQrCodeService qrCodeService;
 
     @GetMapping
     public String index(Model model) {
@@ -60,6 +63,10 @@ public class NotePressUbsController extends NotePressBaseController {
         int purchaseCnt = referService.count(ReferQuery.buildBySelfIdAndType(NotePressSessionUtils.getSessionUser().getId().toString(), ReferTypeEnum.USER_RES));
         model.addAttribute("purchaseCnt", purchaseCnt);
 
+        List<Object> prices = toListBeanNull(qrCodeService.findWxPrices());
+        model.addAttribute("prices", prices);
+        String rate = toRNull(paramService.fetchParamByName(ParamKeyConstant.RECHARGE_RATE), Param.class, Param::getValue);
+        model.addAttribute("multiple", rate != null ? Integer.parseInt(rate) : 10);
         return "ubs";
     }
 
@@ -119,14 +126,18 @@ public class NotePressUbsController extends NotePressBaseController {
     @PostMapping("/create/order")
     @ResponseBody
     public String createOrder(@RequestParam BigDecimal price, @RequestParam String type) {
-        Param domainParam = toBeanNull(paramService.fetchParamByName("recharge_server_domain"), Param.class);
-        Param keyParam = toBeanNull(paramService.fetchParamByName("recharge_sign_secretKey"), Param.class);
+        Param domainParam = toBeanNull(paramService.fetchParamByName(ParamKeyConstant.RECHARGE_SERVER_DOMAIN), Param.class);
+        Param keyParam = toBeanNull(paramService.fetchParamByName(ParamKeyConstant.RECHARGE_SIGN_SECRET_KEY), Param.class);
         if (domainParam != null && keyParam != null) {
             String domain = domainParam.getValue();
             String key = keyParam.getValue();
-            String url = domain + "/pay/order?userId={}&type={}&price={}&sign={}&_t=" + System.currentTimeMillis();
+            String url = domain + "/pay/order?userId={}&type={}&price={}&sign={}";
             long userId = Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getId();
-            String sign = SecureUtil.md5(SecureUtil.md5(price + type) + key);
+            String p = price.toString();
+            if (!p.contains(".")) {
+                p += ".00";
+            }
+            String sign = SecureUtil.md5(SecureUtil.md5(p + type) + key);
             url = StrUtil.format(url, userId, type, price, sign);
             return url;
         }

@@ -25,7 +25,7 @@ public class IndexMenu implements Serializable {
     static String[] level1 = new String[]{
             "console,管理控制台,layui-icon-console",
             "system,系统管理,layui-icon-engine",
-            "settings,网站设置,layui-icon-set",
+            "settings,网站服务设置,layui-icon-set",
             "contents,内容管理,layui-icon-read"
     };
     static String[] level2 = new String[]{
@@ -33,7 +33,8 @@ public class IndexMenu implements Serializable {
             "system,user,用户管理,system/user",
             "system,oauth,第三方登录设置,system/oauth",
             "settings,info,个人资料,settings/info",
-            "settings,website,网站设置,settings/website",
+            "settings,website,偏好设置,settings/website",
+            "settings,wxpay,微信付款码管理,settings/wxpay",
             "settings,server,其他服务设置,settings/server",
             "contents,dict,字典管理,contents/dict",
             "contents,notice,消息中心,contents/notice",

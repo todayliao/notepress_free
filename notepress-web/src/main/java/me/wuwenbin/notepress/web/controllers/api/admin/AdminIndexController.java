@@ -9,21 +9,18 @@ import me.wuwenbin.notepress.api.query.ContentQuery;
 import me.wuwenbin.notepress.api.query.SysUserQuery;
 import me.wuwenbin.notepress.api.service.IContentService;
 import me.wuwenbin.notepress.api.service.IParamService;
+import me.wuwenbin.notepress.api.service.ISysLogService;
 import me.wuwenbin.notepress.api.service.ISysUserService;
 import me.wuwenbin.notepress.api.utils.NotePressServerUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,7 +35,7 @@ public class AdminIndexController extends NotePressBaseController {
     private final IParamService paramService;
     private final IContentService contentService;
     private final ISysUserService userService;
-    private final MongoTemplate mongoTemplate;
+    private final ISysLogService sysLogService;
 
     @GetMapping("/menu")
     public NotePressResult menuJson() {
@@ -67,39 +64,35 @@ public class AdminIndexController extends NotePressBaseController {
     }
 
     private List<SysLog> pvSum(LocalDate time) {
-        Criteria c1 = new Criteria();
-        Criteria c2 = new Criteria();
-        Criteria c3 = new Criteria();
-        Criteria c41 = new Criteria();
-        Criteria c42 = new Criteria();
-        Criteria c43 = new Criteria();
-        Criteria c44 = new Criteria();
+        Map<String, Object> param = new HashMap<>(2);
+        List<String> urls = new ArrayList<>();
         String statisticsMethodType = toRNull(paramService.fetchParamByName(ParamKeyConstant.STATISTICS_METHOD), Param.class, Param::getValue);
         if (!StringUtils.isEmpty(statisticsMethodType)) {
             List<String> dbSetList = Arrays.asList(statisticsMethodType.split("\\|"));
             if (dbSetList.contains("admin")) {
-                c1 = newCriteria("/admin/");
+                urls.add("/admin/");
             }
             if (dbSetList.contains("content")) {
-                c2 = newCriteria("/content/");
+                urls.add("/content/");
             }
             if (dbSetList.contains("home_index")) {
-                c3 = newCriteria("/index");
+                urls.add("/index");
             }
             if (dbSetList.contains("other")) {
-                c41 = newCriteria("/purchase");
-                c42 = newCriteria("/note");
-                c43 = newCriteria("/token/ubs");
-                c44 = newCriteria("/res");
+                urls.add("/purchase");
+                urls.add("/message");
+                urls.add("/note");
+                urls.add("/token/ubs");
+                urls.add("/res");
+            }
+            param.put("urls", urls);
+            if (time != null) {
+                param.put("time", time);
+            } else {
+                param.put("time", LocalDateTime.of(2000, 1, 1, 0, 0, 0));
             }
         }
-        Criteria c = new Criteria();
-        c.orOperator(c1, c2, c3, c41, c42, c43, c44);
-        if (time != null) {
-            c.and("time").gte(time);
-        }
-        return mongoTemplate.find(
-                Query.query(c), SysLog.class, "np_sys_log");
+        return sysLogService.findSysLogs(param);
     }
 
     private int ipSum(LocalDate time) {
@@ -108,10 +101,4 @@ public class AdminIndexController extends NotePressBaseController {
         return sysLogs.size();
     }
 
-
-    private Criteria newCriteria(String url) {
-        return Criteria.byExample(
-                Example.of(SysLog.builder().url(url).build(),
-                        ExampleMatcher.matching().withMatcher("url", ExampleMatcher.GenericPropertyMatchers.contains())));
-    }
 }

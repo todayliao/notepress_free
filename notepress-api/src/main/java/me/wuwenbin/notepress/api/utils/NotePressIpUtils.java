@@ -89,11 +89,12 @@ public class NotePressIpUtils {
      * @return
      */
     public static IpInfo getIpInfo(String ip) {
-        String url = "http://whois.pconline.com.cn/ip.jsp?ip={}";
-        url = StrUtil.format(url, ip);
-        String resp = HttpUtil.get(url);
-        log.info("获取 ip详细地址，参数：{}", ip);
+        String resp = "";
         try {
+            String url = "http://whois.pconline.com.cn/ip.jsp?ip={}";
+            url = StrUtil.format(url, ip);
+            resp = HttpUtil.get(url, 4000);
+            log.info("获取 ip详细地址，参数：{}", ip);
             JSON json = JSONUtil.parse(resp);
             String result = json.toString();
             String[] res = result.split("\\s+");

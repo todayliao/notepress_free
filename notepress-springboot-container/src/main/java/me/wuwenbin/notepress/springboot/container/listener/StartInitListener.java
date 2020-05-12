@@ -13,12 +13,12 @@ import me.wuwenbin.notepress.api.query.ParamQuery;
 import me.wuwenbin.notepress.api.service.IParamService;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.service.facade.ThemeFacade;
+import me.wuwenbin.notepress.service.mapper.SysSessionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -43,7 +43,7 @@ public class StartInitListener implements ApplicationListener<ContextRefreshedEv
     @Qualifier("notePressSetting")
     private final Setting notePressSetting;
     private final JdbcTemplate jdbcTemplate;
-    private final MongoTemplate mongoTemplate;
+    private final SysSessionMapper sessionMapper;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -204,8 +204,7 @@ public class StartInitListener implements ApplicationListener<ContextRefreshedEv
      * 清除会话消息
      */
     private void clearSession() {
-        mongoTemplate.dropCollection("np_sys_sessions");
-        mongoTemplate.dropCollection("np_user_logged_in");
+        sessionMapper.executeArray("TRUNCATE np_sys_session");
     }
 
 }

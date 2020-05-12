@@ -26,4 +26,6 @@ public interface NotePressConstants {
      * 存储在登陆之前最后一次访问的 URL
      */
     String SESSION_LAST_VISIT_URL_KEY = "session_last_visit_url_key";
+
+
 }

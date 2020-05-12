@@ -208,8 +208,13 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
 
             String categories = contentPageQuery.getCates();
             Set<String> contentIdSet = new HashSet<>();
+            boolean selectedCategoriesButNotIncludeContent = false;
             if (StrUtil.isNotEmpty(categories)) {
-                contentIdSet.addAll(getContentIdSetByCates(categories));
+                Set<String> contentIdSetTemp = getContentIdSetByCates(categories);
+                contentIdSet.addAll(contentIdSetTemp);
+                if (CollectionUtil.isEmpty(contentIdSetTemp)) {
+                    selectedCategoriesButNotIncludeContent = true;
+                }
             }
             String tags = contentPageQuery.getTags();
             if (StrUtil.isNotEmpty(tags)) {
@@ -231,10 +236,10 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
                         finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(resultContentIdSet), "id", resultContentIdSet);
                     }
                 } else {
-                    finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet) || StrUtil.isEmpty(contentPageQuery.getCates()), "id", contentIdSet);
+                    finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet) && !selectedCategoriesButNotIncludeContent, "id", contentIdSet);
                 }
             } else {
-                finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet) || StrUtil.isEmpty(contentPageQuery.getCates()), "id", contentIdSet);
+                finalQuery = finalQuery.in(CollectionUtil.isNotEmpty(contentIdSet) && !selectedCategoriesButNotIncludeContent, "id", contentIdSet);
             }
 
 

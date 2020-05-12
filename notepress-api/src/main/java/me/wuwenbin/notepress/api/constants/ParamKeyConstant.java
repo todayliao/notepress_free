@@ -100,4 +100,12 @@ public interface ParamKeyConstant {
     String SEO_DESCRIPTION = "seo_description";
     String SEO_KEYWORDS = "seo_keywords";
 
+    /**
+     * 支付插件参数key
+     */
+    String RECHARGE_SERVER_DOMAIN = "recharge_server_domain";
+    String SWITCH_RECHARGE_SERVER = "switch_recharge_server";
+    String RECHARGE_SIGN_SECRET_KEY = "recharge_sign_secretKey";
+    String RECHARGE_RATE = "recharge_rate";
+
 }

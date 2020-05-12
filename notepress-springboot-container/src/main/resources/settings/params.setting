@@ -50,8 +50,9 @@ admin_global_avatar = 站长/管理员的头像,
 admin_qrcode_alipay = 支付宝二维码,
 admin_qrcode_wechat = 微信支付二维码,
 
-recharge_server_domain = 充值服务的域名/ip地址
-recharge_sign_secretKey = 校对密钥，需要和充值微服务端那边设置的一样，没有请忽略
+recharge_server_domain = 充值服务的域名/ip地址,
+recharge_sign_secretKey = 校对密钥，需要和充值微服务端那边设置的一样，没有请忽略,
+recharge_rate = 充值兑换比率，默认1:10,10
 
 
 [2]

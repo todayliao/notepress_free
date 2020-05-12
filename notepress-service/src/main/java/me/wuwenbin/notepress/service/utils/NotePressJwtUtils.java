@@ -13,6 +13,7 @@ import me.wuwenbin.notepress.api.model.jwt.JwtHelper;
 import me.wuwenbin.notepress.api.service.ISysUserService;
 import me.wuwenbin.notepress.api.utils.NotePressServletUtils;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
+import me.wuwenbin.notepress.service.mapper.SysSessionMapper;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -45,6 +46,10 @@ public class NotePressJwtUtils {
                     .parseClaimsJws(jsonWebToken).getBody();
         } catch (ExpiredJwtException eje) {
             log.error("===== Token过期：{} =====", eje.getMessage());
+            try {
+                NotePressUtils.getBean(SysSessionMapper.class).deleteJwtToken(jsonWebToken);
+            } catch (Exception ignored) {
+            }
             throw new NotePressException(NotePressErrorCode.NotLogin);
         } catch (JwtException e) {
             log.error("===== token解析异常：{} =====", e.getMessage());

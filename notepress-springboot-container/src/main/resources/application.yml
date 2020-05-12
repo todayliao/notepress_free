@@ -2,6 +2,9 @@
 server:
   tomcat:
     uri-encoding: UTF-8
+    remote-ip-header: X-Real-IP
+    protocol-header: X-Forwarded-Proto
+  use-forward-headers: true
 #jwt相关配置
 jwt:
   #过期时间，单位毫秒，2小时
@@ -41,8 +44,8 @@ spring:
     type: ehcache
     ehcache:
       config: ehcache/ehcache.xml
-  data:
-    mongodb:
-      database: np_sys_session
-      host: 127.0.0.1
-      port: 27017
+#  data:
+#    mongodb:
+#      database: np_sys_session
+#      host: 127.0.0.1
+#      port: 27017

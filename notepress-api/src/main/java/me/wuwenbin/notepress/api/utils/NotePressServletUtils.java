@@ -3,8 +3,6 @@ package me.wuwenbin.notepress.api.utils;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import me.wuwenbin.notepress.api.model.jwt.NotePressSession;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -37,14 +35,6 @@ public class NotePressServletUtils extends StrUtil {
         return getRequestAttributes().getResponse();
     }
 
-    /**
-     * 获取session
-     * admin后台访问
-     */
-    public static NotePressSession getSession(String jwtToken) {
-        return NotePressUtils.getBean(MongoTemplate.class).findById(jwtToken,
-                NotePressSession.class, "np_sys_sessions");
-    }
 
     /**
      * 前台访问的session

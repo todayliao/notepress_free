@@ -6,7 +6,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.google.code.kaptcha.Constants;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,9 @@ import me.wuwenbin.notepress.api.exception.NotePressException;
 import me.wuwenbin.notepress.api.model.NotePressResult;
 import me.wuwenbin.notepress.api.model.entity.Param;
 import me.wuwenbin.notepress.api.model.entity.Refer;
+import me.wuwenbin.notepress.api.model.entity.system.SysSession;
 import me.wuwenbin.notepress.api.model.entity.system.SysUser;
+import me.wuwenbin.notepress.api.query.BaseQuery;
 import me.wuwenbin.notepress.api.query.ParamQuery;
 import me.wuwenbin.notepress.api.query.SysUserQuery;
 import me.wuwenbin.notepress.api.service.IOauthService;
@@ -29,6 +30,7 @@ import me.wuwenbin.notepress.api.utils.NotePressIpUtils;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.service.bo.RegisterUserBo;
 import me.wuwenbin.notepress.service.facade.MailFacade;
+import me.wuwenbin.notepress.service.mapper.SysSessionMapper;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import me.zhyd.oauth.model.AuthCallback;
@@ -38,7 +40,6 @@ import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -52,7 +53,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * created by Wuwenbin on 2019/12/4 at 1:42 下午
@@ -64,6 +64,7 @@ import java.util.Objects;
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class NotePressLoginController extends NotePressBaseController {
 
+    private static final SysSessionMapper SESSION_MAPPER = NotePressUtils.getBean(SysSessionMapper.class);
     private final IParamService paramService;
     private final IOauthService oauthService;
     private final ISysUserService sysUserService;
@@ -73,9 +74,6 @@ public class NotePressLoginController extends NotePressBaseController {
     private final Cache<String, String> mailCodeCache;
     @Qualifier("kaptchaCodeCache")
     private final Cache<String, String> kaptchaCodeCache;
-
-    private static final MongoTemplate MONGO_TEMPLATE = NotePressUtils.getBean(MongoTemplate.class);
-
 
     /**
      * 跳转登录页面
@@ -246,7 +244,10 @@ public class NotePressLoginController extends NotePressBaseController {
                         //根据用户 id 查询本站的账号信息，并设置相关 session
                         SysUser sessionUser = sysUserService.getById(userId);
                         String lastVisitUrl = setSessionReturnLastVisitUrl(sessionUser, null);
-                        MONGO_TEMPLATE.insert(sessionUser, "np_user_logged_in");
+                        long cnt = SESSION_MAPPER.selectCount(BaseQuery.build("session_user_id", sessionUser.getId()));
+                        if (cnt == 0) {
+                            SESSION_MAPPER.insert(SysSession.user(sessionUser));
+                        }
                         removeSessionLastVisitUrl();
                         httpResponse.sendRedirect(lastVisitUrl);
                     }

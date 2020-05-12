@@ -17,6 +17,7 @@ import me.wuwenbin.notepress.api.utils.NotePressUtils;
 import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -39,6 +40,7 @@ public class NotePressControllerAdvice extends NotePressBaseController {
     private final IContentService contentService;
     private final ISysNoticeService sysNoticeService;
     private final IDealService dealService;
+    private final Environment environment;
 
 
     @ModelAttribute("settings")

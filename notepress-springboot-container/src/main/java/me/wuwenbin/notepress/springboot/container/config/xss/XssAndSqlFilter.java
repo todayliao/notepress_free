@@ -20,6 +20,7 @@ public class XssAndSqlFilter implements Filter {
             , "/admin/settings/updateMap"
             , "/admin/theme/update"
             , "/token/sub"
+            ,"/payServer"
     };
 
     @Override

@@ -110,10 +110,12 @@ public class NotePressWebMvcConfig implements WebMvcConfigurer {
         List<String> excludePaths = Arrays.asList(
                 "/error/**", "/init/**", "/image/code"
                 , UploadConstant.PATH_PREFIX_VISIT + "/**"
-                , "/user/login", "/admin/login");
+                , "/user/login", "/admin/login", "/payServer/**");
         registry.addInterceptor(new CorsInterceptor()).addPathPatterns("/**").excludePathPatterns(excludePaths).order(1);
         registry.addInterceptor(new InitInterceptor()).addPathPatterns("/**").excludePathPatterns(excludePaths).order(2);
-        registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**").excludePathPatterns("/admin/**").excludePathPatterns(excludePaths).order(3);
+        //排除alipay
+        registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**").excludePathPatterns("/admin/**")
+                .excludePathPatterns(excludePaths).excludePathPatterns("/alipay").order(3);
         registry.addInterceptor(new JwtInterceptor()).addPathPatterns("/admin/**").excludePathPatterns(excludePaths).order(4);
         registry.addInterceptor(new SessionInterceptor()).addPathPatterns("/token/**", "/admin/**", "/**/token/**").excludePathPatterns(excludePaths).order(5);
 

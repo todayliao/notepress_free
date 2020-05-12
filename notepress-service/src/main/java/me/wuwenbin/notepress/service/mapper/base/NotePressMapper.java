@@ -1,5 +1,6 @@
 package me.wuwenbin.notepress.service.mapper.base;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import me.wuwenbin.notepress.api.model.page.NotePressPage;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
@@ -13,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.NumberUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -108,7 +110,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
     default int executeArray(String sql, Object... arrayParameters) {
         Assert.hasText(sql, "sql语句不正确!");
         log.info("==> SQL:" + sql);
-        log.info("==> SQL参数：[{}]", arrayParameters);
+        log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
         int affectCount;
         if (arrayParameters != null && arrayParameters.length > 0) {
             affectCount = JDBC_TEMPLATE.update(sql, arrayParameters);
@@ -155,7 +157,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
         int affectCount;
         if (beanParameter != null) {
             log.info("==> SQL:" + sql);
-            log.info("==> SQL参数：[{}]", beanParameter.toString());
+            log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
             affectCount = NAMED_PARAMETER_JDBC_TEMPLATE.update(sql, generateBeanSqlParamSource(beanParameter));
             log.info("==> 响应条目：[{}]", affectCount);
         } else {
@@ -175,7 +177,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
         try {
             Assert.hasText(sql, "sql语句不正确!");
             log.info("SQL:" + sql);
-            log.info("-- SQL参数：[{}]", arrayParameters);
+            log.info("-- SQL参数：[{}]", Arrays.toString(arrayParameters));
             if (arrayParameters != null && arrayParameters.length > 0) {
                 return JDBC_TEMPLATE.queryForObject(sql, Number.class, arrayParameters);
             } else {
@@ -203,7 +205,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
         try {
             Assert.hasText(sql, "sql语句不正确!");
             log.info("==> SQL:" + sql);
-            log.info("==> SQL参数：[{}]", arrayParameters);
+            log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
             if (arrayParameters != null && arrayParameters.length > 0) {
                 Number n = JDBC_TEMPLATE.queryForObject(sql, numberClass, arrayParameters);
                 if (n == null) {
@@ -302,7 +304,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             Assert.hasText(sql, "sql语句不正确!");
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 return NAMED_PARAMETER_JDBC_TEMPLATE.queryForObject(sql, generateBeanSqlParamSource(beanParameter), Number.class);
             } else {
                 return findNumberByArray(sql);
@@ -329,7 +331,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             Assert.hasText(sql, "sql语句不正确!");
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 Number n = NAMED_PARAMETER_JDBC_TEMPLATE.queryForObject(sql, generateBeanSqlParamSource(beanParameter), numberClass);
                 if (n == null) {
                     return NumberUtils.parseNumber("0", numberClass);
@@ -366,7 +368,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
         try {
             Assert.hasText(sql, "sql语句不正确!");
             log.info("==> SQL: {}", sql);
-            log.info("==> SQL参数：[{}]", arrayParameters);
+            log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
             if (arrayParameters != null && arrayParameters.length > 0) {
                 return JDBC_TEMPLATE.queryForObject(sql, objClass, arrayParameters);
             } else {
@@ -423,7 +425,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             Assert.hasText(sql, "sql语句不正确!");
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 return NAMED_PARAMETER_JDBC_TEMPLATE.queryForObject(sql, generateBeanSqlParamSource(beanParameter), objClass);
             } else {
                 return findPrimitiveByArray(sql, objClass);
@@ -448,7 +450,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
         try {
             Assert.hasText(sql, "sql语句不正确!");
             log.info("==> SQL: {}", sql);
-            log.info("==> SQL参数：[{}]", arrayParameters);
+            log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
             if (arrayParameters != null && arrayParameters.length > 0) {
                 return JDBC_TEMPLATE.queryForMap(sql, arrayParameters);
             } else {
@@ -501,7 +503,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             Assert.hasText(sql, "sql语句不正确!");
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 return NAMED_PARAMETER_JDBC_TEMPLATE.queryForMap(sql, generateBeanSqlParamSource(beanParameter));
             } else {
                 return findMapByArray(sql);
@@ -528,7 +530,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             Assert.hasText(sql, "sql语句不正确!");
             Assert.notNull(clazz, "类集合中对象类型不能为空!");
             log.info("==> SQL: {}", sql);
-            log.info("==> SQL参数：[{}]", arrayParameters);
+            log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
             if (arrayParameters != null && arrayParameters.length > 0) {
                 return JDBC_TEMPLATE.queryForObject(sql, generateRowMapper(clazz), arrayParameters);
             } else {
@@ -586,7 +588,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             Assert.notNull(clazz, "集合中对象类型不能为空！");
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 return NAMED_PARAMETER_JDBC_TEMPLATE.queryForObject(sql, generateBeanSqlParamSource(beanParameter), generateRowMapper(clazz));
             } else {
                 return findBeanByArray(sql, clazz);
@@ -613,7 +615,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
         try {
             Assert.hasText(sql, "sql语句不正确!");
             log.info("==> SQL: {}", sql);
-            log.info("==> SQL参数：[{}]", arrayParameters);
+            log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
             List<R> list;
             if (arrayParameters != null && arrayParameters.length > 0) {
                 list = JDBC_TEMPLATE.queryForList(sql, objClass, arrayParameters);
@@ -677,7 +679,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             List<R> list;
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 list = NAMED_PARAMETER_JDBC_TEMPLATE.queryForList(sql, generateBeanSqlParamSource(beanParameter), objClass);
                 log.info("==> 响应条目：[{}]", list.size());
             } else {
@@ -704,7 +706,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
         try {
             Assert.hasText(sql, "sql语句不正确!");
             log.info("==> SQL: {}", sql);
-            log.info("==> SQL参数：[{}]", arrayParameters);
+            log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
             List<Map<String, Object>> list;
             if (arrayParameters != null && arrayParameters.length > 0) {
                 list = JDBC_TEMPLATE.queryForList(sql, arrayParameters);
@@ -764,7 +766,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             List<Map<String, Object>> list;
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 list = NAMED_PARAMETER_JDBC_TEMPLATE.queryForList(sql, generateBeanSqlParamSource(beanParameter));
                 log.info("==> 响应条目：[{}]", list.size());
             } else {
@@ -793,7 +795,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             Assert.hasText(sql, "sql语句不正确!");
             Assert.notNull(clazz, "集合中对象类型不能为空!");
             log.info("==> SQL: {}", sql);
-            log.info("==> SQL参数：[{}]", arrayParameters);
+            log.info("==> SQL参数：[{}]", Arrays.toString(arrayParameters));
             List<T> list;
             if (arrayParameters != null && arrayParameters.length > 0) {
                 list = JDBC_TEMPLATE.query(sql, generateRowMapper(clazz), arrayParameters);
@@ -857,7 +859,7 @@ public interface NotePressMapper<T> extends BaseMapper<T> {
             List<T> list;
             if (beanParameter != null) {
                 log.info("==> SQL: {}", sql);
-                log.info("==> SQL参数：[{}]", beanParameter);
+                log.info("==> SQL参数：[{}]", BeanUtil.beanToMap(beanParameter));
                 list = NAMED_PARAMETER_JDBC_TEMPLATE.query(sql, generateBeanSqlParamSource(beanParameter), generateRowMapper(clazz));
                 log.info("==> 响应条目：[{}]", list.size());
             } else {
