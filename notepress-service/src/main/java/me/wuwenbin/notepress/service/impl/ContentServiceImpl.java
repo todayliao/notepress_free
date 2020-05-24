@@ -222,6 +222,9 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
             }
             String contentIds = contentPageQuery.getContentIds();
             if (StrUtil.isNotEmpty(contentIds)) {
+                if ("-1".equals(contentIds)) {
+                    contentIdSet.add("-1");
+                }
                 contentIdSet.addAll(Arrays.asList(contentIds.split("\\.")));
             }
 

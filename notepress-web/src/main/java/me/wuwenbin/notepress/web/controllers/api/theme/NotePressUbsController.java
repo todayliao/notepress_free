@@ -31,7 +31,6 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -92,9 +91,8 @@ public class NotePressUbsController extends NotePressBaseController {
     @PostMapping("/myComments")
     @ResponseBody
     public NotePressResult myComments(Page<SysNotice> page) {
-        SysUser sessionUser = NotePressSessionUtils.getSessionUser();
+        SysUser sessionUser = NotePressSessionUtils.getFrontSessionUser();
         page.addOrder(OrderItem.desc("gmt_create"));
-        //noinspection ConstantConditions
         IPage<SysNotice> nPage = noticeService.page(page, Wrappers.<SysNotice>query().eq("user_id", sessionUser.getId()));
         List<SysNotice> noticeList = nPage.getRecords();
         Map<String, String> contentIdTitleMap = noticeList.stream()
@@ -109,9 +107,8 @@ public class NotePressUbsController extends NotePressBaseController {
     @PostMapping("/myPurchased")
     @ResponseBody
     public NotePressResult myPurchased(Page<Res> page) {
-        SysUser sessionUser = NotePressSessionUtils.getSessionUser();
+        SysUser sessionUser = NotePressSessionUtils.getFrontSessionUser();
         page.addOrder(OrderItem.desc("gmt_create"));
-        assert sessionUser != null;
         List<String> resIds = referService.list(
                 ReferQuery.buildBySelfIdAndType(sessionUser.getId().toString(), ReferTypeEnum.USER_RES))
                 .stream()
@@ -132,7 +129,7 @@ public class NotePressUbsController extends NotePressBaseController {
             String domain = domainParam.getValue();
             String key = keyParam.getValue();
             String url = domain + "/pay/order?userId={}&type={}&price={}&sign={}";
-            long userId = Objects.requireNonNull(NotePressSessionUtils.getSessionUser()).getId();
+            long userId = NotePressSessionUtils.getFrontSessionUser().getId();
             String p = price.toString();
             if (!p.contains(".")) {
                 p += ".00";

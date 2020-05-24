@@ -38,6 +38,16 @@ public class NotePressSessionUtils {
         }
     }
 
+    /**
+     * 如果确定是前台的请求，那么可以使用此方法获取session user对象
+     *
+     * @return
+     */
+    public static SysUser getFrontSessionUser() {
+        HttpSession session = NotePressServletUtils.getSession();
+        return (SysUser) session.getAttribute(NotePressConstants.SESSION_USER_KEY);
+    }
+
     public static void setSessionUser(SysUser sessionUser, String jwtToken) {
         if (isAdminReq() && StrUtil.isNotEmpty(jwtToken)) {
             SYS_SESSION_MAPPER.insert(SysSession.admin(jwtToken));

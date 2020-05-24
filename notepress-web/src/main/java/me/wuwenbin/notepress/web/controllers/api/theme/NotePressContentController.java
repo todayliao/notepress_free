@@ -18,6 +18,7 @@ import me.wuwenbin.notepress.api.query.DictionaryQuery;
 import me.wuwenbin.notepress.api.query.ReferQuery;
 import me.wuwenbin.notepress.api.service.*;
 import me.wuwenbin.notepress.service.impl.helper.ContentHelper;
+import me.wuwenbin.notepress.service.utils.NotePressSessionUtils;
 import me.wuwenbin.notepress.web.controllers.api.NotePressBaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,6 +47,8 @@ public class NotePressContentController extends NotePressBaseController {
     private final ISysNoticeService noticeService;
     private final ICategoryService categoryService;
     private final IReferService referService;
+    private final IDealService dealService;
+    private final IHideService hideService;
 
 
     @GetMapping("/{cId}")
@@ -88,7 +91,7 @@ public class NotePressContentController extends NotePressBaseController {
         }
 
         //处理隐藏标签
-        ContentHelper.handleShowContent(cId, content.getHtmlContent());
+        content.setHtmlContent(ContentHelper.handleShowContent(cId, content.getHtmlContent()));
         model.addAttribute("content", content);
 
         return new ModelAndView("content");
@@ -129,6 +132,22 @@ public class NotePressContentController extends NotePressBaseController {
         return contentService.updateApproveById(cId);
     }
 
+
+    @PostMapping("/token/purchase")
+    @ResponseBody
+    public NotePressResult purchaseHide(@RequestParam String contentId, @RequestParam String hideId) {
+        SysUser sessionUser = NotePressSessionUtils.getFrontSessionUser();
+        long userId = sessionUser.getId();
+        int remainCoin = dealService.findCoinSumByUserId(userId).getDataInt();
+        int hidePrice = hideService.getById(hideId).getHidePrice();
+        if (remainCoin >= hidePrice) {
+            int cnt = hideService.purchaseContentHideContent(contentId, hideId, userId, hidePrice);
+            return writeJsonJudgedBool(cnt == 1, "购买成功！", "购买失败！");
+        } else {
+            return writeJsonErrorMsg("您的硬币不足，请充值之后再购买！");
+        }
+
+    }
 
     //====================私有方法=====================
 

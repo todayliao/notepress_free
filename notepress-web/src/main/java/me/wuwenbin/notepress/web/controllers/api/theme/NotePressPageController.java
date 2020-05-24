@@ -60,7 +60,7 @@ public class NotePressPageController extends NotePressBaseController {
      */
     @GetMapping("/index")
     public String index(Model model, Page<Content> page, ContentPageQuery contentPageQuery,
-                        @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings) {
+                        @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings, String search) {
         setPage(page);
         setSearch(contentPageQuery, model, themeSettings);
         //页面的内容，包含置顶、热门、推荐3种标签的一起
@@ -68,7 +68,7 @@ public class NotePressPageController extends NotePressBaseController {
         Page<Content> contentsAllPage = pageHandle(page, contentPageQuery);
         model.addAttribute("contentsAllPage", contentsAllPage);
         //页面内容，不包含热门、推荐2种标签类型一起，但是包括置顶
-        contentPageQuery.setSearchType(ContentPageQuery.SearchType.NONE);
+        contentPageQuery.setSearchType(ContentPageQuery.SearchType.ALL);
         Page<Content> contentsNonePage = pageHandle(page, contentPageQuery);
         model.addAttribute("contentsNonePage", contentsNonePage);
         //页面内容，只包含热门的1种标签类型
@@ -133,7 +133,7 @@ public class NotePressPageController extends NotePressBaseController {
         List<Dictionary> tagListTop30 = toListBeanNull(dictionaryService.top30TagList());
         model.addAttribute("tagList", tagListTop30);
 
-        return "contents";
+        return StrUtil.isEmpty(search) ? "contents" : "search";
     }
 
     @RequestMapping("/index/next")

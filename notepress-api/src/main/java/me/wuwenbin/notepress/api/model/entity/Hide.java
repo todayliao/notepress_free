@@ -20,5 +20,6 @@ public class Hide extends BaseEntity<Hide> {
     private String id;
     private String contentId;
     private HideTypeEnum hideType;
+    private Integer hidePrice;
     private String hideHtml;
 }

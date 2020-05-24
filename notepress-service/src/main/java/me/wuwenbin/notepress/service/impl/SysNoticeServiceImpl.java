@@ -82,14 +82,14 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
             List<Map<String, Object>> rl = sysNoticeMapper.findRankList();
             rl.forEach(rlMap -> {
                 Long userId = MapUtil.getLong(rlMap, "user_id");
-                List<SysNotice> latestNotices = sysNoticeMapper.selectList(SysNoticeQuery.build("content_id", "-1", "user_id", userId));
+                List<SysNotice> latestNotices = sysNoticeMapper.selectList(SysNoticeQuery.build("user_id", userId));
                 rlMap.put("gmt_create", latestNotices.get(0).getGmtCreate());
             });
             return NotePressResult.createOkData(rl);
         }
         rankList.forEach(rlMap -> {
             Long userId = MapUtil.getLong(rlMap, "user_id");
-            List<SysNotice> latestNotices = sysNoticeMapper.selectList(SysNoticeQuery.build("content_id", "-1", "user_id", userId));
+            List<SysNotice> latestNotices = sysNoticeMapper.selectList(SysNoticeQuery.build("user_id", userId));
             rlMap.put("gmt_create", latestNotices.get(0).getGmtCreate());
         });
         return NotePressResult.createOkData(rankList);

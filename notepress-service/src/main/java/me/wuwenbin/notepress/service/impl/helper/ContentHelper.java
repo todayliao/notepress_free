@@ -43,6 +43,7 @@ public class ContentHelper {
 
     private static final String HIDE_COMMENT = "comment";
     private static final String HIDE_LOGIN = "login";
+    private static final String HIDE_PURCHASE = "purchase";
 
     /**
      * 页面必须要有comment-list这个锚点
@@ -53,8 +54,13 @@ public class ContentHelper {
      * 页面必须要有toLoginPage()的js方法
      */
     private static final String HIDE_LOGIN_REPLACEMENT = "<blockquote data-htype=\"{hideType}\" data-hid=\"{hideId}\" class=\"layui-elem-quote\">此处内容登录之后可见，" +
-            "<a class=\"layui-text\" href=\"javascript:toLoginPage();\" target=\"_blank\">点我登录</a></blockquote>";
+            "<a class=\"layui-text\" href=\"javascript:npfront.toLoginPage();\" target=\"_blank\">点我登录</a></blockquote>";
 
+    /**
+     * 购买隐藏的内容
+     */
+    private static final String HIDE_PURCHASE_REPLACEMENT = "<blockquote data-htype=\"{hideType}\" data-hid=\"{hideId}\" class=\"layui-elem-quote\">此处内容需购买（{price}硬币），" +
+            "<a class=\"layui-text\" onclick=\"purchaseContent('{contentId}','{hideId}');\">点我购买</a></blockquote>";
 
     /**
      * 组装hideMap的参数map
@@ -195,6 +201,38 @@ public class ContentHelper {
             contentHtmlResult = contentHtml;
         }
 
+
+        //处理购买可见
+        List<JXNode> hidePurchases = doc.selN(StrUtil.format("//div[@data-hide='{}']", HIDE_PURCHASE));
+        for (JXNode purchase : hidePurchases) {
+            String html = purchase.asElement().outerHtml();
+            String hideId = purchase.asElement().attr("data-hid");
+            String hidePrice = purchase.asElement().attr("data-price");
+            if (StrUtil.isEmpty(hideId)) {
+                throw new NotePressException("未获取到hide token，请刷新重试！");
+            }
+            Map<String, Object> hideMap = new HashMap<>(4);
+            hideMap.put("hideId", hideId);
+            hideMap.put("hideType", HIDE_PURCHASE);
+            hideMap.put("contentId", contentId);
+            hideMap.put("price", hidePrice);
+            String replacement = StrUtil.format(HIDE_PURCHASE_REPLACEMENT, hideMap);
+            contentHtml = contentHtml.replace(html, replacement);
+            Hide existHideInTable = hideService.getOne(HideQuery.build(hideId, contentId, HIDE_PURCHASE));
+            if (existHideInTable == null) {
+                if (StrUtil.isEmpty(hidePrice)) {
+                    throw new RuntimeException("隐藏的购买内容，必须填写购买硬币的个数！");
+                }
+                Hide hide = Hide.builder()
+                        .id(hideId).contentId(contentId)
+                        .hideType(HideTypeEnum.NOT_PURCHASE).hidePrice(Integer.valueOf(hidePrice)).hideHtml(html).build();
+                hideService.save(hide);
+            } else {
+                hideService.update(HideQuery.build(html, hideId, contentId, HideTypeEnum.NOT_PURCHASE.getValue()));
+            }
+            contentHtmlResult = contentHtml;
+        }
+
         return contentHtmlResult;
     }
 
@@ -226,6 +264,26 @@ public class ContentHelper {
             }
         }
 
+        //处理购买可见
+        if (sessionUser != null) {
+            if (sessionUser.getAdmin()) {
+                contentHtml = handleShow(doc, contentHtml, HIDE_PURCHASE);
+            } else {
+                long userId = sessionUser.getId();
+                IHideService hideService = NotePressUtils.getBean(IHideService.class);
+                List<JXNode> hides = doc.selN(StrUtil.format("//blockquote[@data-htype='{}']", HIDE_PURCHASE));
+                for (JXNode hideNode : hides) {
+                    String hideId = hideNode.asElement().attr("data-hid");
+
+                    if (hideService.userIsPurchased(contentId, userId, hideId)) {
+                        Hide hide = hideService.getById(hideId);
+                        contentHtml = contentHtml.replace(hideNode.asElement().outerHtml(), hide.getHideHtml());
+                    }
+                }
+            }
+        }
+
+
         //处理登录可见
         if (sessionUser != null) {
             contentHtml = handleShow(doc, contentHtml, HIDE_LOGIN);
@@ -237,7 +295,7 @@ public class ContentHelper {
      * 处理前后端分离url的不一致的显示的问题
      *
      * @param content
-     * @param isHide true：去掉https://domain:port，false:添加http://domain:port/
+     * @param isHide  true：去掉https://domain:port，false:添加http://domain:port/
      */
     public static void handleBasePath(Content content, boolean isHide) {
         String htmlContent = content.getHtmlContent();

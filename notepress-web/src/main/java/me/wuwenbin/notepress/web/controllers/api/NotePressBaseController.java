@@ -255,6 +255,7 @@ public class NotePressBaseController implements NotePressConstants {
         }
     }
 
+
     /**
      * 设置访问的url
      *

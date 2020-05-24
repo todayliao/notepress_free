@@ -168,7 +168,7 @@ public class DefThemeController extends NotePressBaseController {
             contentPageQuery.setWords(s);
         }
         String noteCates = MapUtil.getStr(themeSettings, "noteCates");
-        if (noteCates != null) {
+        if (StringUtils.isNotEmpty(noteCates)) {
             contentPageQuery.setCates(noteCates);
         } else {
             contentPageQuery.setContentIds("-1");
