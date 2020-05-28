@@ -16,4 +16,15 @@ public interface IDealService extends INotePressService<Deal> {
      * @return
      */
     NotePressResult findCoinSumByUserId(Long userId);
+
+    /**
+     * 充值硬币
+     *
+     * @param userId
+     * @param optUserId
+     * @param coin
+     * @param remark
+     * @return
+     */
+    NotePressResult rechargeCoin(long userId, long optUserId, int coin, String remark);
 }

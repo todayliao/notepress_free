@@ -218,7 +218,7 @@ public class ContentHelper {
             hideMap.put("price", hidePrice);
             String replacement = StrUtil.format(HIDE_PURCHASE_REPLACEMENT, hideMap);
             contentHtml = contentHtml.replace(html, replacement);
-            Hide existHideInTable = hideService.getOne(HideQuery.build(hideId, contentId, HIDE_PURCHASE));
+            Hide existHideInTable = hideService.getOne(HideQuery.build(hideId, contentId, HideTypeEnum.NOT_PURCHASE.getValue()));
             if (existHideInTable == null) {
                 if (StrUtil.isEmpty(hidePrice)) {
                     throw new RuntimeException("隐藏的购买内容，必须填写购买硬币的个数！");

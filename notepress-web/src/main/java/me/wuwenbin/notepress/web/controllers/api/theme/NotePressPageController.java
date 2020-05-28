@@ -63,6 +63,9 @@ public class NotePressPageController extends NotePressBaseController {
                         @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings, String search) {
         setPage(page);
         setSearch(contentPageQuery, model, themeSettings);
+        if (StrUtil.isEmpty(search)) {
+            setNoneShow(contentPageQuery, themeSettings);
+        }
         //页面的内容，包含置顶、热门、推荐3种标签的一起
         contentPageQuery.setSearchType(ContentPageQuery.SearchType.ALL);
         Page<Content> contentsAllPage = pageHandle(page, contentPageQuery);
@@ -234,6 +237,16 @@ public class NotePressPageController extends NotePressBaseController {
             contentPageQuery.setWords(s);
         }
         model.addAttribute("s", s);
+    }
+
+    /**
+     * 设置首页不显示的分类，此方法需要放到setSearch之后
+     */
+    private void setNoneShow(ContentPageQuery contentPageQuery, Map<String, Object> themeSettings) {
+        String noneCates = MapUtil.getStr(themeSettings, "noneCates");
+        if (StrUtil.isNotEmpty(noneCates)) {
+            contentPageQuery.setExcludeCates(contentPageQuery.getExcludeCates().concat(".").concat(noneCates));
+        }
     }
 
     /**

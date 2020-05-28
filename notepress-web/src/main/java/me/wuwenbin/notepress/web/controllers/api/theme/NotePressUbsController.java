@@ -2,6 +2,7 @@ package me.wuwenbin.notepress.web.controllers.api.theme;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import me.wuwenbin.notepress.api.constants.ParamKeyConstant;
 import me.wuwenbin.notepress.api.constants.enums.ReferTypeEnum;
 import me.wuwenbin.notepress.api.model.NotePressResult;
+import me.wuwenbin.notepress.api.model.entity.Deal;
 import me.wuwenbin.notepress.api.model.entity.Dictionary;
 import me.wuwenbin.notepress.api.model.entity.Param;
 import me.wuwenbin.notepress.api.model.entity.Res;
@@ -28,6 +30,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +53,7 @@ public class NotePressUbsController extends NotePressBaseController {
     private final IResService resService;
     private final IParamService paramService;
     private final IWxpayQrCodeService qrCodeService;
+    private final IDealService dealService;
 
     @GetMapping
     public String index(Model model) {
@@ -139,5 +144,26 @@ public class NotePressUbsController extends NotePressBaseController {
             return url;
         }
         return null;
+    }
+
+    /**
+     * 用户一日一签加硬币
+     *
+     * @return
+     */
+    @GetMapping("/sign")
+    @ResponseBody
+    public NotePressResult rechargeUser() {
+        long userId = NotePressSessionUtils.getFrontSessionUser().getId();
+        int c = dealService.count(Wrappers.<Deal>query()
+                .eq("user_id", userId)
+                .like("gmt_create", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))));
+        if (c > 0) {
+            return NotePressResult.createOkMsg("今日已签到，请明日再来！");
+        } else {
+            int coin = RandomUtil.randomInt(10, 20);
+            int res = dealService.rechargeCoin(userId, userId, coin, "签到获取硬币").getDataInt();
+            return writeJsonJudgedBool(res == 1, "签到成功，获取" + coin + "硬币", "充值失败！");
+        }
     }
 }

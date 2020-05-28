@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 /**
  * @author wuwen
  */
@@ -27,4 +29,21 @@ public class DealServiceImpl extends ServiceImpl<DealMapper, Deal> implements ID
         return NotePressResult.createOkData(c);
     }
 
+    /**
+     * 充值硬币
+     *
+     * @param coin
+     * @param remark
+     * @return
+     */
+    @Override
+    public NotePressResult rechargeCoin(long userId, long optUserId, int coin, String remark) {
+        int c = dealMapper.insert(
+                Deal.builder()
+                        .dealAmount(coin).userId(userId)
+                        .build().gmtCreate(LocalDateTime.now())
+                        .createBy(userId)
+                        .remark(remark));
+        return NotePressResult.createOkData(c);
+    }
 }

@@ -44,6 +44,7 @@ spring:
     type: ehcache
     ehcache:
       config: ehcache/ehcache.xml
+
 #  data:
 #    mongodb:
 #      database: np_sys_session
