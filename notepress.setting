@@ -13,7 +13,7 @@ aesKey = ___notepress____
 [db]
 ip =
 port =
-name = notepress2
+name = notepress
 user =
 pass =
 useSSL = false

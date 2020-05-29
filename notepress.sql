@@ -1,16 +1,16 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 本机
-Source Server Version : 50728
-Source Host           : 127.0.0.1:3306
+Source Server         : 120.26.46.2(wuwenbin_miako wwbmiako569523036)
+Source Server Version : 50725
+Source Host           : 120.26.46.2:3306
 Source Database       : notepress
 
 Target Server Type    : MYSQL
-Target Server Version : 50728
+Target Server Version : 50725
 File Encoding         : 65001
 
-Date: 2020-03-29 23:41:34
+Date: 2020-05-29 14:20:17
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -34,7 +34,7 @@ CREATE TABLE `np_category` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_content
@@ -86,7 +86,7 @@ CREATE TABLE `np_deal` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_dictionary
@@ -105,7 +105,7 @@ CREATE TABLE `np_dictionary` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_hide
@@ -115,6 +115,7 @@ CREATE TABLE `np_hide` (
   `id` varchar(100) NOT NULL,
   `content_id` varchar(100) NOT NULL,
   `hide_type` varchar(50) DEFAULT NULL,
+  `hide_price` int(20) DEFAULT NULL,
   `hide_html` text,
   `gmt_create` datetime DEFAULT NULL,
   `gmt_update` datetime DEFAULT NULL,
@@ -152,14 +153,52 @@ CREATE TABLE `np_param` (
   `name` varchar(50) NOT NULL,
   `value` text,
   `group` int(11) DEFAULT NULL,
-  `remark` varchar(255) DEFAULT NULL,
   `order_index` int(11) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
   `gmt_create` datetime DEFAULT NULL,
   `gmt_update` datetime DEFAULT NULL,
   `create_by` bigint(20) DEFAULT NULL,
   `update_by` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for np_pay_order
+-- ----------------------------
+DROP TABLE IF EXISTS `np_pay_order`;
+CREATE TABLE `np_pay_order` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `order_no` varchar(50) DEFAULT NULL,
+  `order_type` varchar(50) NOT NULL DEFAULT 'wechat',
+  `order_price` double(10,2) NOT NULL DEFAULT '0.00',
+  `order_name` varchar(255) NOT NULL,
+  `pay_status` tinyint(4) DEFAULT NULL COMMENT '0未支付、1已支付、-1已过期',
+  `expired` datetime NOT NULL COMMENT '订单过期时间',
+  `extra_json` text COMMENT '额外的信息，使用json格式',
+  `gmt_create` datetime DEFAULT NULL COMMENT '订单创建时间',
+  `gmt_update` datetime DEFAULT NULL COMMENT '这个一般作为已支付订单的支付时间',
+  `create_by` bigint(20) DEFAULT NULL,
+  `update_by` bigint(20) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for np_pay_qrcode
+-- ----------------------------
+DROP TABLE IF EXISTS `np_pay_qrcode`;
+CREATE TABLE `np_pay_qrcode` (
+  `id` varchar(50) NOT NULL,
+  `qr_type` varchar(20) NOT NULL,
+  `qr_url` varchar(255) NOT NULL,
+  `qr_price` double(10,2) NOT NULL DEFAULT '0.00',
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_update` datetime DEFAULT NULL,
+  `create_by` bigint(20) DEFAULT NULL,
+  `update_by` bigint(20) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`qr_type`,`qr_price`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_refer
@@ -177,7 +216,7 @@ CREATE TABLE `np_refer` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=294 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=279 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_res
@@ -185,8 +224,10 @@ CREATE TABLE `np_refer` (
 DROP TABLE IF EXISTS `np_res`;
 CREATE TABLE `np_res` (
   `id` varchar(50) NOT NULL,
-  `res_hash` varchar(50) NOT NULL COMMENT '文件哈希，也是七牛文件的标识，使用此作为文件名获取',
+  `res_hash` varchar(255) NOT NULL COMMENT '文件哈希，也是七牛文件的标识，使用此作为文件名获取',
   `res_url` longtext NOT NULL,
+  `res_intro_url` text,
+  `auth_code` varchar(50) DEFAULT NULL,
   `res_fsize_bytes` double DEFAULT '0' COMMENT '文件大小 单位为B',
   `coin` int(11) NOT NULL DEFAULT '0',
   `gmt_create` datetime DEFAULT NULL,
@@ -212,7 +253,33 @@ CREATE TABLE `np_res_cate` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for np_sys_log
+-- ----------------------------
+DROP TABLE IF EXISTS `np_sys_log`;
+CREATE TABLE `np_sys_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `content_type` varchar(255) DEFAULT NULL,
+  `ip_addr` varchar(255) DEFAULT NULL,
+  `ip_info` varchar(255) DEFAULT NULL,
+  `request_method` varchar(255) DEFAULT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `user_agent` text,
+  `username` varchar(255) DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `browser` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL,
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_update` datetime DEFAULT NULL,
+  `create_by` bigint(20) DEFAULT NULL,
+  `update_by` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FULLTEXT KEY `ip_info` (`ip_info`)
+) ENGINE=InnoDB AUTO_INCREMENT=3497 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_sys_notice
@@ -238,7 +305,24 @@ CREATE TABLE `np_sys_notice` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for np_sys_session
+-- ----------------------------
+DROP TABLE IF EXISTS `np_sys_session`;
+CREATE TABLE `np_sys_session` (
+  `jwt_token` text,
+  `session_user_id` bigint(20) DEFAULT NULL,
+  `session_username` varchar(20) DEFAULT NULL,
+  `expired` datetime NOT NULL,
+  `admin_req` tinyint(1) DEFAULT NULL,
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_update` datetime DEFAULT NULL,
+  `create_by` bigint(20) DEFAULT NULL,
+  `update_by` bigint(20) DEFAULT NULL,
+  `remark` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_sys_user
@@ -262,7 +346,7 @@ CREATE TABLE `np_sys_user` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for np_upload
@@ -283,4 +367,4 @@ CREATE TABLE `np_upload` (
   `update_by` bigint(20) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL COMMENT '上传信息备注，比如是哪里上传的',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
