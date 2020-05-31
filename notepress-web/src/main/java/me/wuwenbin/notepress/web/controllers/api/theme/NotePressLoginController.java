@@ -2,9 +2,12 @@ package me.wuwenbin.notepress.web.controllers.api.theme;
 
 import cn.hutool.cache.Cache;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.http.HtmlUtil;
 import cn.hutool.json.JSONUtil;
 import com.google.code.kaptcha.Constants;
@@ -88,7 +91,7 @@ public class NotePressLoginController extends NotePressBaseController {
         SysUser sessionUser = NotePressSessionUtils.getSessionUser();
         if (sessionUser != null) {
             if (StrUtil.isNotEmpty(redirectUrl)) {
-                return new ModelAndView(new RedirectView(redirectUrl));
+                return new ModelAndView(new RedirectView(URLUtil.decode(Base64Decoder.decodeStr(redirectUrl))));
             }
             return new ModelAndView(new RedirectView("/"));
         }
@@ -249,7 +252,7 @@ public class NotePressLoginController extends NotePressBaseController {
                             SESSION_MAPPER.insert(SysSession.user(sessionUser));
                         }
                         removeSessionLastVisitUrl();
-                        httpResponse.sendRedirect(lastVisitUrl);
+                        httpResponse.sendRedirect(URLUtil.decode(Base64Decoder.decodeStr(lastVisitUrl)));
                     }
                     //如果没绑定，提示绑定并转发至绑定页面
                     else {
@@ -305,7 +308,9 @@ public class NotePressLoginController extends NotePressBaseController {
                 //绑定成功跳转至登录前的最后访问的页面
                 Object lastVisitUrl = session.getAttribute(SESSION_LAST_VISIT_URL_KEY);
                 removeSessionLastVisitUrl();
-                return NotePressResult.createOkMsg("绑定成功").addExtra("url", lastVisitUrl);
+                return NotePressResult.createOkMsg("绑定成功")
+                        .addExtra("url",
+                                URLUtil.decode(ObjectUtil.isNotEmpty(lastVisitUrl) ? URLUtil.decode(Base64Decoder.decodeStr(lastVisitUrl.toString())) : "/"));
             } else {
                 return NotePressResult.createErrorFormatMsg("绑定失败：{}", isSavedR.getMsg());
             }

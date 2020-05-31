@@ -1,7 +1,9 @@
 package me.wuwenbin.notepress.web.controllers.api;
 
+import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -267,7 +269,7 @@ public class NotePressBaseController implements NotePressConstants {
         //获取登录之前最后一次访问的页面 URL
         String lastVisitUrl = (String) session.getAttribute(SESSION_LAST_VISIT_URL_KEY);
         lastVisitUrl = StrUtil.isEmpty(lastVisitUrl) ? "/" : lastVisitUrl;
-        return lastVisitUrl;
+        return URLUtil.decode(Base64Decoder.decodeStr(lastVisitUrl));
     }
 
     /**
