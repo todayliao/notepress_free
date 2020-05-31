@@ -63,7 +63,7 @@ public class NotePressPageController extends NotePressBaseController {
     @GetMapping("/index")
     public String index(Model model, Page<Content> page, ContentPageQuery contentPageQuery,
                         @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings,
-                        String search, String tp) {
+                        String search, String tp, String zdy) {
         setPage(page);
         setSearch(contentPageQuery, model, themeSettings);
         if (StrUtil.isEmpty(search) && StrUtil.isEmpty(tp)) {
@@ -139,7 +139,11 @@ public class NotePressPageController extends NotePressBaseController {
         List<Dictionary> tagListTop30 = toListBeanNull(dictionaryService.top30TagList());
         model.addAttribute("tagList", tagListTop30);
 
-        return StrUtil.isEmpty(search) ? StrUtil.isEmpty(tp) ? "contents" : "page" : "search";
+        if (StrUtil.isNotEmpty(zdy)) {
+            return "zdy";
+        } else {
+            return StrUtil.isEmpty(search) ? StrUtil.isEmpty(tp) ? "contents" : "page" : "search";
+        }
     }
 
     @RequestMapping("/index/next")

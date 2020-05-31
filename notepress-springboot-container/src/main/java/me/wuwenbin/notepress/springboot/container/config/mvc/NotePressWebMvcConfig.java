@@ -12,7 +12,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mobile.device.DeviceResolverHandlerInterceptor;
+import org.springframework.mobile.device.site.SitePreferenceHandlerInterceptor;
+import org.springframework.mobile.device.site.SitePreferenceHandlerMethodArgumentResolver;
 import org.springframework.util.StringUtils;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -117,7 +121,7 @@ public class NotePressWebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**").excludePathPatterns("/admin/**")
                 .excludePathPatterns(excludePaths).excludePathPatterns("/alipay").order(3);
         registry.addInterceptor(new JwtInterceptor()).addPathPatterns("/admin/**").excludePathPatterns(excludePaths).order(4);
-        registry.addInterceptor(new SessionInterceptor()).addPathPatterns("/token/**", "/admin/**", "/**/token/**","/note").excludePathPatterns(excludePaths).order(5);
+        registry.addInterceptor(new SessionInterceptor()).addPathPatterns("/token/**", "/admin/**", "/**/token/**", "/note").excludePathPatterns(excludePaths).order(5);
 
         List<String> logPaths = Arrays.asList(
                 "/", "/index", "/np-login", "/np-register", "/np-bind", "/admin/**"
@@ -125,6 +129,13 @@ public class NotePressWebMvcConfig implements WebMvcConfigurer {
                 , "/content/**"
         );
         registry.addInterceptor(new LogInterceptor()).addPathPatterns(logPaths).order(6);
+        registry.addInterceptor(new DeviceResolverHandlerInterceptor());
+        registry.addInterceptor(new SitePreferenceHandlerInterceptor());
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(new SitePreferenceHandlerMethodArgumentResolver());
     }
 
     /**
