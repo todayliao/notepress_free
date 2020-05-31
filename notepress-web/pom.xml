@@ -8,7 +8,7 @@
     <artifactId>notepress-web</artifactId>
     <version>v2020.004_0528</version>
 
-    <name>notepress-web</name>
+    <name>notepress-support-web</name>
     <description>
         此模块为项目的视图WEB部分，依赖notepress-service模块
     </description>
@@ -42,5 +42,8 @@
 
     </dependencies>
 
+    <build>
+        <finalName>notepress-support-web</finalName>
+    </build>
 
 </project>

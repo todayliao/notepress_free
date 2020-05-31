@@ -117,7 +117,7 @@ public class NotePressWebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(new ThemeInterceptor()).addPathPatterns("/**").excludePathPatterns("/admin/**")
                 .excludePathPatterns(excludePaths).excludePathPatterns("/alipay").order(3);
         registry.addInterceptor(new JwtInterceptor()).addPathPatterns("/admin/**").excludePathPatterns(excludePaths).order(4);
-        registry.addInterceptor(new SessionInterceptor()).addPathPatterns("/token/**", "/admin/**", "/**/token/**").excludePathPatterns(excludePaths).order(5);
+        registry.addInterceptor(new SessionInterceptor()).addPathPatterns("/token/**", "/admin/**", "/**/token/**","/note").excludePathPatterns(excludePaths).order(5);
 
         List<String> logPaths = Arrays.asList(
                 "/", "/index", "/np-login", "/np-register", "/np-bind", "/admin/**"

@@ -8,7 +8,7 @@
     <artifactId>notepress-api</artifactId>
     <version>v2020.004_0528</version>
 
-    <name>notepress-api</name>
+    <name>notepress-support-api</name>
     <description>NotePress 通用对象和接口</description>
     <url>https://github.com/miyakowork/notepress_free/tree/master/notepress-api</url>
 
@@ -73,5 +73,8 @@
 
     </dependencies>
 
+    <build>
+        <finalName>notepress-support-api</finalName>
+    </build>
 
 </project>

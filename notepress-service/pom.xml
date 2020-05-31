@@ -8,7 +8,7 @@
     <artifactId>notepress-service</artifactId>
     <version>v2020.004_0528</version>
 
-    <name>notepress-service</name>
+    <name>notepress-support-service</name>
     <description>
         此模块主要是项目中业务的具体实现方法
         依赖notepress-api模块
@@ -91,5 +91,8 @@
 
     </dependencies>
 
+    <build>
+        <finalName>notepress-support-service</finalName>
+    </build>
 
 </project>

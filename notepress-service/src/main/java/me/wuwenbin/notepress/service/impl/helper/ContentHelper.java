@@ -14,6 +14,7 @@ import me.wuwenbin.notepress.api.query.SysNoticeQuery;
 import me.wuwenbin.notepress.api.service.IHideService;
 import me.wuwenbin.notepress.api.utils.NotePressServletUtils;
 import me.wuwenbin.notepress.api.utils.NotePressUtils;
+import me.wuwenbin.notepress.service.mapper.HideMapper;
 import me.wuwenbin.notepress.service.mapper.ParamMapper;
 import me.wuwenbin.notepress.service.mapper.ReferMapper;
 import me.wuwenbin.notepress.service.mapper.SysNoticeMapper;
@@ -84,6 +85,16 @@ public class ContentHelper {
     public static void deleteContentRefer(String cid) {
         ReferMapper referMapper = NotePressUtils.getBean(ReferMapper.class);
         referMapper.delete(ReferQuery.buildDeleteBySelfId(cid));
+    }
+
+    /**
+     * 删除文章隐藏内容
+     *
+     * @param cid
+     */
+    public static void deleteContentHide(String cid) {
+        HideMapper hideMapper = NotePressUtils.getBean(HideMapper.class);
+        hideMapper.delete(HideQuery.build("content_id", cid));
     }
 
     /**

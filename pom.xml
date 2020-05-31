@@ -21,7 +21,7 @@
     </modules>
     <packaging>pom</packaging>
 
-    <name>notepress-parent</name>
+    <name>notepress-starter-app</name>
     <description>NotePress 内容平台</description>
     <url>https://github.com/miyakowork/notepress</url>
 
@@ -39,6 +39,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <finalName>notepress-starter-app</finalName>
                     <fork>true</fork>
                     <!-- spring-boot:run 中文乱码解决 -->
                     <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>

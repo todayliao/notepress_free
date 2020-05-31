@@ -56,14 +56,17 @@ public class NotePressPageController extends NotePressBaseController {
      * @param model
      * @param page
      * @param contentPageQuery
+     * @param search           是否为搜索
+     * @param tp               themePage是否为主题页面
      * @return
      */
     @GetMapping("/index")
     public String index(Model model, Page<Content> page, ContentPageQuery contentPageQuery,
-                        @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings, String search) {
+                        @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings,
+                        String search, String tp) {
         setPage(page);
         setSearch(contentPageQuery, model, themeSettings);
-        if (StrUtil.isEmpty(search)) {
+        if (StrUtil.isEmpty(search) && StrUtil.isEmpty(tp)) {
             setNoneShow(contentPageQuery, themeSettings);
         }
         //页面的内容，包含置顶、热门、推荐3种标签的一起
@@ -136,19 +139,24 @@ public class NotePressPageController extends NotePressBaseController {
         List<Dictionary> tagListTop30 = toListBeanNull(dictionaryService.top30TagList());
         model.addAttribute("tagList", tagListTop30);
 
-        return StrUtil.isEmpty(search) ? "contents" : "search";
+        return StrUtil.isEmpty(search) ? StrUtil.isEmpty(tp) ? "contents" : "page" : "search";
     }
 
     @RequestMapping("/index/next")
     @ResponseBody
     public NotePressResult nextPage(Page<Content> page, ContentPageQuery contentPageQuery,
-                                    @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings) {
+                                    @ModelAttribute("themeSettings") HashMap<String, Object> themeSettings,
+                                    String search, String tp) {
         setPage(page);
-        Map<String, Object> resultMap = new HashMap<>(5);
-        //页面内容，不包含置顶、热门、推荐、最新的4种标签类型一起
-        if (contentPageQuery.getSearchType() != ContentPageQuery.SearchType.ALL) {
-            contentPageQuery.setSearchType(ContentPageQuery.SearchType.NONE);
+        setSearch(contentPageQuery, null, themeSettings);
+        if (StrUtil.isEmpty(search) && StrUtil.isEmpty(tp)) {
+            setNoneShow(contentPageQuery, themeSettings);
         }
+        Map<String, Object> resultMap = new HashMap<>(5);
+//        //页面内容，不包含置顶、热门、推荐、最新的4种标签类型一起
+//        if (contentPageQuery.getSearchType() != ContentPageQuery.SearchType.ALL) {
+//            contentPageQuery.setSearchType(ContentPageQuery.SearchType.NONE);
+//        }
 
         String noteCates = MapUtil.getStr(themeSettings, "noteCates");
         if (StrUtil.isNotEmpty(noteCates)) {
@@ -236,7 +244,9 @@ public class NotePressPageController extends NotePressBaseController {
             contentPageQuery.setTitle(s);
             contentPageQuery.setWords(s);
         }
-        model.addAttribute("s", s);
+        if (model != null) {
+            model.addAttribute("s", s);
+        }
     }
 
     /**

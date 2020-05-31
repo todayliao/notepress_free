@@ -149,6 +149,7 @@ public class ContentServiceImpl extends ServiceImpl<ContentMapper, Content> impl
         content.setGmtUpdate(LocalDateTime.now());
         content.setUpdateBy(userId);
         ContentHelper.deleteContentRefer(content.getId());
+        ContentHelper.deleteContentHide(content.getId());
         int d = contentMapper.deleteById(content.getId());
         if (d == 1) {
             NotePressResult result = createContent(content, userId, categories, tagNames);
